@@ -11,16 +11,14 @@
         "Other"
     ],
     "activationEvents": [
-        "onCommand:extension.sayHello"
+        "onCommand:extension.openTypedScratch"
     ],
     "main": "./extension",
     "contributes": {
-        "commands": [
-            {
-                "command": "extension.sayHello",
-                "title": "Hello World"
-            }
-        ]
+        "commands": [{
+            "command": "extension.openTypedScratch",
+            "title": "Typed Scratch"
+        }]
     },
     "scripts": {
         "postinstall": "node ./node_modules/vscode/bin/install",
