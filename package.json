@@ -17,7 +17,7 @@
     "contributes": {
         "commands": [{
             "command": "extension.openTypedScratch",
-            "title": "Typed Scratch"
+            "title": "Open scratch"
         }]
     },
     "scripts": {
@@ -30,5 +30,8 @@
         "eslint": "^4.11.0",
         "@types/node": "^7.0.43",
         "@types/mocha": "^2.2.42"
+    },
+    "dependencies": {
+        "md5": "^2.2.1"
     }
 }
