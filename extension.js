@@ -14,10 +14,11 @@
     const SCRATCHPADS_FOLDER = "scratchpads";
     const FILE_NAME_TEMPLATE = "scratch";
     const FILE_TYPES_DB = "typesConfig.json";
-    const FILE_TYPES_INITIAL_DB = "typesInitialConfig.json";
+
     let basePath;
     let scratchpadsPath;
     let projectScratchpadsPath;
+    let fileTypesDB;
     let fileTypes;
 
     // this method is called when your extension is activated
@@ -37,6 +38,7 @@
         let dedicatedPath = md5(vscode.env.appRoot);
 
         basePath = context.extensionPath;
+        fileTypesDB = path.join(basePath, FILE_TYPES_DB);
         scratchpadsPath = path.join(context.extensionPath, SCRATCHPADS_FOLDER);
 
         if (!fs.existsSync(scratchpadsPath)) {
@@ -64,21 +66,14 @@
      * Load the latest order of file types
      */
     function loadFileTypes() {
-        let fullPath = path.join(basePath, FILE_TYPES_DB);
-
-        if (!fs.existsSync(fullPath)) {
-            fullPath = path.join(basePath, FILE_TYPES_INITIAL_DB);
-        }
-
-        fileTypes = JSON.parse(fs.readFileSync(fullPath));
+        fileTypes = JSON.parse(fs.readFileSync(fileTypesDB));
     }
 
     /**
      * Save the latest order of file types
      */
     function saveFileTypes() {
-        let fullPath = path.join(basePath, FILE_TYPES_DB);
-        fs.writeFileSync(fullPath, JSON.stringify(fileTypes));
+        fs.writeFileSync(fileTypesDB, JSON.stringify(fileTypes, null, 2));
     }
 
     /**
@@ -121,14 +116,40 @@
                 return;
             }
 
-            reorderFileTypes(selection.index);
-            createScratch(fileTypes[0]);
+            if (selection.label === "Add Custom ...") {
+                let lang, ext;
+
+                getUserInput("Enter type name:")
+                    .then(val => {
+                        lang = val;
+                        return validate("lang", lang);
+                    })
+                    .then(() => {
+                        return getUserInput("Enter file extension:");
+                    })
+                    .then(val => {
+                        ext = val;
+                        return validate("ext", ext);
+                    })
+                    .then(() => {
+                        fileTypes.unshift({ lang: lang, ext: ext });
+                        createScratch(fileTypes[0]);
+                    })
+                    .catch(err => {
+                        window.showErrorMessage(err.message);
+                    });
+                ;
+            }
+            else {
+                reorderFileTypes(selection.index);
+                createScratch(fileTypes[0]);
+            }
         });
     }
 
     /**
      * Move the element at the given index to the top of the array
-     * in order to keep the last selection
+     * in order to keep the last selection at the top of the list
      * @param {number} index The index of the element to move
      */
     function reorderFileTypes(index) {
@@ -136,7 +157,54 @@
     }
 
     /**
+     * Get the user's input.
+     * @param {string} placeholder Placeholder text for the input box
+     */
+    function getUserInput(placeholder) {
+        // Wrap Thenable with a Promise for ease of use
+        return new Promise((resolve, reject) => {
+            window.showInputBox({ placeHolder: placeholder })
+                .then((val) => {
+                    resolve(val);
+                }, (err) => {
+                    reject(err);
+                })
+        })
+    }
+
+    /**
+     * Validate that the language or extension do not exist in the DB
+     * @param {string} key Either "lang" or "ext"
+     * @param {string} val The value to validate
+     */
+    function validate(key, val) {
+        return new Promise((resolve) => {
+            if (!val) {
+                return;
+            }
+
+            let msg;
+            let found = fileTypes.some(item => {
+                if (item[key].toLowerCase() === val.toLowerCase()) {
+                    msg = `File type already exist {lang: ${item.lang}, ext: ${item.ext}}`;
+                    return true;
+                }
+
+                return false;
+            });
+
+            if (found) {
+                throw new Error(msg);
+            }
+            else {
+                resolve();
+            }
+        });
+    }
+
+    /**
      * Remove all scratch files (usually when closing VS Code)
+     * TODO: Need to fix the error messages due to open tabs of deleted files
      */
     function removeScratchpads() {
         let files = fs.readdirSync(projectScratchpadsPath);

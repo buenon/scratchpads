@@ -1,0 +1,38 @@
+[
+  {
+    "lang": "JavaScript",
+    "ext": "js"
+  },
+  {
+    "lang": "JSON",
+    "ext": "json"
+  },
+  {
+    "lang": "HTML",
+    "ext": "html"
+  },
+  {
+    "lang": "CSS",
+    "ext": "css"
+  },
+  {
+    "lang": "SCSS",
+    "ext": "scss"
+  },
+  {
+    "lang": "Java",
+    "ext": "java"
+  },
+  {
+    "lang": "XML",
+    "ext": "xml"
+  },
+  {
+    "lang": "Plain Text",
+    "ext": "txt"
+  },
+  {
+    "lang": "Add Custom ...",
+    "ext": ""
+  }
+]
