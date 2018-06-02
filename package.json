@@ -1,7 +1,7 @@
 {
     "name": "scratchpads",
-    "displayName": "ScratchPads",
-    "description": "Create multiple scratch files of different file types",
+    "displayName": "Scratchpads",
+    "description": "Create multiple scratchpad files of different file types",
     "version": "0.0.1",
     "publisher": "buenonadav",
     "engines": {
@@ -11,13 +11,28 @@
         "Other"
     ],
     "activationEvents": [
-        "onCommand:extension.openTypedScratch"
+        "onCommand:extension.newScratchpad",
+        "onCommand:extension.removeScratchpads"
     ],
-    "main": "./extension",
+    "main": "./src/extension",
     "contributes": {
         "commands": [{
-            "command": "extension.openTypedScratch",
-            "title": "Open scratch"
+                "command": "extension.newScratchpad",
+                "title": "Scratchpads: New scratchpad"
+            },
+            {
+                "command": "extension.removeScratchpads",
+                "title": "Scratchpads: Remove scratchpads"
+            }
+        ],
+        "keybindings": [{
+            "command": "extension.newScratchpad",
+            "key": "ctrl+alt+shift+insert",
+            "mac": "cmd+alt+shift+insert"
+        }, {
+            "command": "extension.removeScratchpads",
+            "key": "ctrl+alt+shift+delete",
+            "mac": "cmd+alt+shift+delete"
         }]
     },
     "scripts": {
