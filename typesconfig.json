@@ -1,38 +1,39 @@
-[
-  {
-    "lang": "JavaScript",
+[{
+    "type": "JavaScript",
     "ext": "js"
   },
   {
-    "lang": "JSON",
+    "type": "JSON",
     "ext": "json"
   },
   {
-    "lang": "HTML",
+    "type": "HTML",
     "ext": "html"
   },
   {
-    "lang": "CSS",
+    "type": "CSS",
     "ext": "css"
   },
   {
-    "lang": "SCSS",
+    "type": "SCSS",
     "ext": "scss"
   },
   {
-    "lang": "Java",
+    "type": "Java",
     "ext": "java"
   },
   {
-    "lang": "XML",
+    "type": "XML",
     "ext": "xml"
   },
   {
-    "lang": "Plain Text",
+    "type": "Plain Text",
     "ext": "txt"
   },
   {
-    "lang": "Add Custom ...",
-    "ext": ""
+    "type": "Add Custom..."
+  },
+  {
+    "type": "Remove..."
   }
 ]

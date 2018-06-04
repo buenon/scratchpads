@@ -125,27 +125,32 @@
      * @param {number} index The index of the element to move
      */
     function reorderFileTypes(index) {
-        fileTypes.splice(0, 0, fileTypes.splice(index, 1)[0]);
-        saveFileTypes();
+        if (index !== 0) {
+            fileTypes.splice(0, 0, fileTypes.splice(index, 1)[0]);
+            saveFileTypes();
+        }
     }
 
     /**
      * Select the type of the scratchpad file 
      */
     function selectFileType() {
-        var items = [];
+        let items = [];
 
-        for (const i in fileTypes) {
-            items.push({ label: fileTypes[i].lang, index: i });
-        }
+        fileTypes.map((item, i) => {
+            items.push({ label: item.type, index: i });
+        });
 
         window.showQuickPick(items).then((selection) => {
             if (!selection) {
                 return;
             }
 
-            if (selection.label === "Add Custom ...") {
+            if (selection.label === "Add Custom...") {
                 addNewFileType();
+            }
+            else if (selection.label === "Remove...") {
+                removeFileType();
             }
             else {
                 reorderFileTypes(selection.index);
@@ -156,15 +161,15 @@
 
     /**
      * Add a new file type to the DB
-     * Validation will fail if the language name or extension already exists
+     * Validation will fail if the file type's name or extension already exists
      */
     function addNewFileType() {
-        let lang, ext;
+        let type, ext;
 
-        getUserInput("Enter type name:")
+        getUserInput("Enter file type name:")
             .then(val => {
-                lang = val;
-                return validate("lang", lang);
+                type = val;
+                return validate("type", type);
             })
             .then(() => {
                 return getUserInput("Enter file extension:");
@@ -174,7 +179,7 @@
                 return validate("ext", ext);
             })
             .then(() => {
-                fileTypes.unshift({ lang: lang, ext: ext });
+                fileTypes.unshift({ type: type, ext: ext });
                 saveFileTypes();
                 createScratchpad(fileTypes[0]);
             })
@@ -182,6 +187,35 @@
                 window.showErrorMessage(err.message);
             });
         ;
+    }
+
+    function removeFileType() {
+        let items = [];
+
+        fileTypes.map((item, i) => {
+            if (item.ext) {
+                items.push({ label: item.type, index: i });
+            }
+        });
+
+        window.showQuickPick(items, { canPickMany: true }).then((selection) => {
+            if (!selection || !selection.length) {
+                return;
+            }
+
+            selection.sort((a, b) => {
+                return b.index - a.index;
+            });
+
+            let labels = selection.map((item) => {
+                fileTypes.splice(item.index, 1);
+                return item.label;
+            });
+
+            window.showInformationMessage(`Removed  file type${labels.length > 1 ? "s" : ""}: '${labels.join("', '")}'`);
+
+            saveFileTypes();
+        });
     }
 
     /**
@@ -201,8 +235,8 @@
     }
 
     /**
-     * Validate that the language or extension do not exist in the DB
-     * @param {string} key Either "lang" or "ext"
+     * Validate that the file type or extension do not exist in the DB
+     * @param {string} key Either "type" or "ext"
      * @param {string} val The value to validate
      */
     function validate(key, val) {
@@ -213,8 +247,8 @@
 
             let msg;
             let found = fileTypes.some(item => {
-                if (item[key].toLowerCase() === val.toLowerCase()) {
-                    msg = `File type already exist {lang: ${item.lang}, ext: ${item.ext}}`;
+                if (item[key] && item[key].toLowerCase() === val.toLowerCase()) {
+                    msg = `File type already exist {type: ${item.type}, ext: ${item.ext}}`;
                     return true;
                 }
 
@@ -332,7 +366,7 @@
             console.log("Back to initial tab. Stopping operation...");
         }
         else {
-            console.log("No open tabs`");
+            console.log("No open tabs");
         }
     }
 
