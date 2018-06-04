@@ -16,6 +16,17 @@
     ],
     "main": "./src/extension",
     "contributes": {
+        "configuration": {
+            "type": "object",
+            "title": "Scratchpads configuration",
+            "properties": {
+                "scratchpads.promptForRemoval": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "Prompt the user when removing scratchpads"
+                }
+            }
+        },
         "commands": [{
                 "command": "extension.newScratchpad",
                 "title": "Scratchpads: New scratchpad"
@@ -24,16 +35,7 @@
                 "command": "extension.removeScratchpads",
                 "title": "Scratchpads: Remove scratchpads"
             }
-        ],
-        "keybindings": [{
-            "command": "extension.newScratchpad",
-            "key": "ctrl+alt+shift+insert",
-            "mac": "cmd+alt+shift+insert"
-        }, {
-            "command": "extension.removeScratchpads",
-            "key": "ctrl+alt+shift+delete",
-            "mac": "cmd+alt+shift+delete"
-        }]
+        ]
     },
     "scripts": {
         "postinstall": "node ./node_modules/vscode/bin/install",

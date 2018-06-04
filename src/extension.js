@@ -15,8 +15,12 @@
     const SCRATCHPADS_FOLDER = "scratchpads";
     const FILE_NAME_TEMPLATE = "scratch";
     const FILE_TYPES_DB = "typesConfig.json";
+    const FILE_TYPES_STATE = "fileTypesState";
     const ACTIONS_TIMEOUT = 200; // Need to pause a bit when changing or closing the active tab 
+    const PROMPT_FOR_REMOVAL = "promptForRemoval";
 
+    let context;
+    let configuration;
     let basePath;
     let scratchpadsPath;
     let projectScratchpadsPath;
@@ -26,8 +30,9 @@
 
     // this method is called when your extension is activated
     // your extension is activated the very first time the command is executed
-    function activate(context) {
-        init(context);
+    function activate(ctx) {
+        context = ctx;
+        init();
 
         let createCommand = commands.registerCommand('extension.newScratchpad', selectFileType);
         context.subscriptions.push(createCommand);
@@ -40,17 +45,16 @@
      * Save state and free up resources
      */
     function deactivate() {
-        saveFileTypes();
         removeProjectFolderIfEmpty();
     }
 
     /**
      * Initialization
-     * @param {Object} context The extension object
      */
-    function init(context) {
+    function init() {
         let dedicatedPath = md5(vscode.env.appRoot);
 
+        configuration = vscode.workspace.getConfiguration('scratchpads');
         basePath = context.extensionPath;
         fileTypesDB = path.join(basePath, FILE_TYPES_DB);
         scratchpadsPath = path.join(context.extensionPath, SCRATCHPADS_FOLDER);
@@ -100,14 +104,19 @@
      * Load the file types DB
      */
     function loadFileTypes() {
-        fileTypes = JSON.parse(fs.readFileSync(fileTypesDB));
+        fileTypes = context.globalState.get(FILE_TYPES_STATE);
+
+        if (!fileTypes) {
+            fileTypes = JSON.parse(fs.readFileSync(fileTypesDB));
+            saveFileTypes();
+        }
     }
 
     /**
      * Save the file types DB
      */
     function saveFileTypes() {
-        fs.writeFileSync(fileTypesDB, JSON.stringify(fileTypes, null, 2));
+        context.globalState.update(FILE_TYPES_STATE, fileTypes);
     }
 
     /**
@@ -117,6 +126,7 @@
      */
     function reorderFileTypes(index) {
         fileTypes.splice(0, 0, fileTypes.splice(index, 1)[0]);
+        saveFileTypes();
     }
 
     /**
@@ -165,6 +175,7 @@
             })
             .then(() => {
                 fileTypes.unshift({ lang: lang, ext: ext });
+                saveFileTypes();
                 createScratchpad(fileTypes[0]);
             })
             .catch(err => {
@@ -250,11 +261,42 @@
      * TODO: Need to fix the error messages due to open tabs of deleted files
      */
     function removeScratchpads() {
-        closeTabs().then(() => {
-            deleteScratchpadFiles();
-        });
+        promptForRemoval()
+            .then(() => {
+                return closeTabs();
+            })
+            .then(() => {
+                deleteScratchpadFiles();
+            })
+            .catch(err => {
+                console.log(err);
+            });
     }
 
+    function promptForRemoval() {
+        return new Promise((resolve, reject) => {
+            let isPromptForRemoval = configuration.inspect(PROMPT_FOR_REMOVAL).globalValue;
+            if (isPromptForRemoval === undefined || isPromptForRemoval) {
+                window.showWarningMessage("Are you sure you want to remove all scratchpads?", { modal: true }, "Yes", "Always")
+                    .then(item => {
+                        switch (item) {
+                            case "Yes":
+                                resolve();
+                                break;
+                            case "Always":
+                                configuration.update(PROMPT_FOR_REMOVAL, false, true);
+                                resolve();
+                                break;
+                        }
+                    }, err => {
+                        reject(err);
+                    });
+            }
+            else {
+                resolve();
+            }
+        });
+    }
     /**
      * Close all open tabs which edit a scratchpad document.
      * Use a "hack" which uses workbench actions (closeActiveEditor and nextEditor)
@@ -326,6 +368,8 @@
      * Delete the scratchpad files from the project's scratchpads folder.
      */
     function deleteScratchpadFiles() {
+        console.log("Deleting scratchpad files");
+
         let files = fs.readdirSync(projectScratchpadsPath);
 
         for (var i = 0, len = files.length; i < len; i++) {
