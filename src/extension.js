@@ -2,6 +2,11 @@
     exports.activate = activate;
     exports.deactivate = deactivate;
 
+    // Exports for file types functions
+    exports.addNewFileType = addNewFileType;
+    exports.removeFileType = removeFileType;
+    exports.restoreDefaultFileTypes = restoreDefaultFileTypes;
+
     // The module 'vscode' contains the VS Code extensibility API
     // Import the module and reference it with the alias vscode in your code below
     const fs = require('fs');
@@ -27,6 +32,8 @@
     let fileTypesDB;
     let fileTypes;
     let scratchpadPathRegrx;
+
+    let app = this;
 
     // this method is called when your extension is activated
     // your extension is activated the very first time the command is executed
@@ -103,8 +110,13 @@
     /**
      * Load the file types DB
      */
-    function loadFileTypes() {
-        fileTypes = context.globalState.get(FILE_TYPES_STATE);
+    function loadFileTypes(isReload = false) {
+        if (isReload) {
+            fileTypes = undefined;
+        }
+        else {
+            fileTypes = context.globalState.get(FILE_TYPES_STATE);
+        }
 
         if (!fileTypes) {
             fileTypes = JSON.parse(fs.readFileSync(fileTypesDB));
@@ -146,13 +158,12 @@
                 return;
             }
 
-            if (selection.label === "Add Custom...") {
-                addNewFileType();
+            let type = fileTypes[selection.index];
+
+            if (type.func) {
+                app[type.func]();
             }
-            else if (selection.label === "Remove...") {
-                removeFileType();
-            }
-            else {
+            else if (type.ext) {
                 reorderFileTypes(selection.index);
                 createScratchpad(fileTypes[0]);
             }
@@ -216,6 +227,15 @@
 
             saveFileTypes();
         });
+    }
+
+    function restoreDefaultFileTypes() {
+        window.showWarningMessage("Are you sure you want to restore defaule file types?", { modal: true }, "Yes")
+            .then(answer => {
+                if (answer) {
+                    loadFileTypes(true);
+                }
+            });
     }
 
     /**
@@ -413,6 +433,7 @@
             }
         }
 
+        window.showInformationMessage("Removed all scratchpads");
     }
 
     /**

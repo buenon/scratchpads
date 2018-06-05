@@ -31,9 +31,18 @@
     "ext": "txt"
   },
   {
-    "type": "Add Custom..."
+    "type": "________________"
   },
   {
-    "type": "Remove..."
+    "type": "Add Custom...",
+    "func": "addNewFileType"
+  },
+  {
+    "type": "Remove...",
+    "func": "removeFileType"
+  },
+  {
+    "type": "Restore Defaults...",
+    "func": "restoreDefaultFileTypes"
   }
 ]
