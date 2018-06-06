@@ -21,7 +21,7 @@
     const FILE_NAME_TEMPLATE = "scratch";
     const FILE_TYPES_DB = "typesConfig.json";
     const FILE_TYPES_STATE = "fileTypesState";
-    const ACTIONS_TIMEOUT = 200; // Need to pause a bit when changing or closing the active tab 
+    const ACTIONS_TIMEOUT = 500; // Need to pause a bit when changing or closing the active tab 
     const PROMPT_FOR_REMOVAL = "promptForRemoval";
 
     let context;
