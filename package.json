@@ -2,19 +2,19 @@
     "name": "scratchpads",
     "displayName": "Scratchpads",
     "description": "Create multiple scratchpad files of different file types",
-    "version": "0.0.1",
+    "version": "0.0.2",
     "publisher": "buenon",
-	"author": {
-		"name": "Nadav Bueno",
-		"email": "buenonadav@gmail.com"
-	},
-	"license": "MIT",
-	"homepage": "https://github.com/buenon/scratchpads/blob/master/README.md",
-	"repository": {
-		"type": "git",
-		"url": "https://github.com/buenon/scratchpads"
-	},
-	"icon": "images/icon.png",
+    "author": {
+        "name": "Nadav Bueno",
+        "email": "buenonadav@gmail.com"
+    },
+    "license": "MIT",
+    "homepage": "https://github.com/buenon/scratchpads/blob/master/README.md",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/buenon/scratchpads"
+    },
+    "icon": "images/icon.png",
     "engines": {
         "vscode": "^1.23.0"
     },
@@ -38,7 +38,8 @@
                 }
             }
         },
-        "commands": [{
+        "commands": [
+            {
                 "command": "scratchpads.newScratchpad",
                 "title": "Scratchpads: New scratchpad"
             },
