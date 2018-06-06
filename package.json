@@ -4,6 +4,17 @@
     "description": "Create multiple scratchpad files of different file types",
     "version": "0.0.1",
     "publisher": "buenonadav",
+	"author": {
+		"name": "Nadav Bueno",
+		"email": "buenonadav@gmail.com"
+	},
+	"license": "MIT",
+	"homepage": "https://github.com/buenon/scratchpads/blob/master/README.md",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/buenon/scratchpads"
+	},
+	"icon": "images/icon.png",
     "engines": {
         "vscode": "^1.23.0"
     },

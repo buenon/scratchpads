@@ -31,7 +31,7 @@
     let projectScratchpadsPath;
     let fileTypesDB;
     let fileTypes;
-    let scratchpadPathRegrx;
+    let scratchpadPathRegex;
 
     let app = this;
 
@@ -76,7 +76,7 @@
             fs.mkdirSync(projectScratchpadsPath);
         }
 
-        scratchpadPathRegrx = escapeRegExp(
+        scratchpadPathRegex = escapeRegExp(
             path.join(
                 path.basename(context.extensionPath),
                 SCRATCHPADS_FOLDER,
@@ -90,7 +90,7 @@
 
     /**
      * Source reference: https://stackoverflow.com/a/6969486/1324724
-     * We need to escape special charachters when using string.match()
+     * We need to escape special characters when using string.match()
      * 
      * @param {string} str Regex string to escape
      */
@@ -104,7 +104,7 @@
      * @param {TextEditor} editor The tab to inspect
      */
     function isScratchpadEditor(editor) {
-        return editor && editor.document.fileName.match(scratchpadPathRegrx);
+        return editor && editor.document.fileName.match(scratchpadPathRegex);
     }
 
     /**
@@ -200,6 +200,9 @@
         ;
     }
 
+    /**
+     * Remove file types from the list
+     */
     function removeFileType() {
         let items = [];
 
@@ -229,8 +232,11 @@
         });
     }
 
+    /**
+     * Restore the default list of file types
+     */
     function restoreDefaultFileTypes() {
-        window.showWarningMessage("Are you sure you want to restore defaule file types?", { modal: true }, "Yes")
+        window.showWarningMessage("Are you sure you want to restore default file types?", { modal: true }, "Yes")
             .then(answer => {
                 if (answer) {
                     loadFileTypes(true);
@@ -286,7 +292,7 @@
 
     /**
      * Create a new scratchpad file
-     * If file name exists increment counter untill a new file can be created
+     * If file name exists increment counter until a new file can be created
      * 
      * @param {Object} type The file type object
      */
@@ -327,6 +333,9 @@
             });
     }
 
+    /**
+     * Prompt the user for confirmation before removing scratchpads
+     */
     function promptForRemoval() {
         return new Promise((resolve, reject) => {
             let isPromptForRemoval = configuration.inspect(PROMPT_FOR_REMOVAL).globalValue;
@@ -351,6 +360,7 @@
             }
         });
     }
+    
     /**
      * Close all open tabs which edit a scratchpad document.
      * Use a "hack" which uses workbench actions (closeActiveEditor and nextEditor)
@@ -362,7 +372,7 @@
 
         while (initial && isScratchpadEditor(initial)) {
             // Started with a scratchpad tab
-            // Close tab untill it is not longer a scratchpad tab
+            // Close tab until it is not longer a scratchpad tab
             console.log("initial is a scratchpad: " + initial.document.fileName);
 
             await closeActiveEditor();
@@ -373,7 +383,7 @@
             console.log("initial editor: " + initial.document.fileName);
 
             while (initial.id !== curr.id) {
-                // Iterate over open tabs and close scratchpad tabs untill we're back to the initial tab
+                // Iterate over open tabs and close scratchpad tabs until we're back to the initial tab
                 if (isScratchpadEditor(window.activeTextEditor)) {
                     await closeActiveEditor();
                 }
@@ -437,7 +447,7 @@
     }
 
     /**
-     * Remove the project's scratchpads folder in case it's empty when deacivating the extension
+     * Remove the project's scratchpads folder in case it's empty when deactivating the extension
      */
     function removeProjectFolderIfEmpty() {
         let files = fs.readdirSync(projectScratchpadsPath);
