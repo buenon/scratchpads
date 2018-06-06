@@ -1,65 +1,61 @@
-# scratchpads README
+# Scratchpads README
+Create multiple scratchpad files for doodling while you're coding.
 
-This is the README for your extension "scratchpads". After writing up a brief description, we recommend including the following sections.
+## Highlights
+* Create multiple scratchpads
+* Create scratchpads of different languages and file types
+* Enjoy VSCode intellisense in your scratchpads
+* Scratchpad are not interfering your project and can be removed at any time
 
 ## Features
 
-Describe specific features of your extension including screenshots of your extension in action. Image paths are relative to this README file.
+### Add a new screatchpad
+* Run the command "Screatchpads: New scratchpad" from the Command Palette
+* Select the desired file type
 
-For example if there is an image subfolder under your extension project workspace:
+![Create new Scratchpas](https://raw.githubusercontent.com/buenon/scratchpads/master/images/scratchpad_new.gif)
 
-\!\[feature X\]\(images/feature-x.png\)
+### Remove scratchpad files
+* Run the command "Screatchpads: Remove scratchpads" from the Command Palette
 
-> Tip: Many popular extensions utilize animations. This is an excellent way to show off your extension! We recommend short, focused animations that are easy to follow.
+*\* Removing scratchpad files loops through all the open tabs and closes the scratchpad ones before deleting the files (might seem wierd)*
 
-## Requirements
+### Add a new file type to the list
+* Run the command "Screatchpads: New scratchpad" from the Command Palette
+* Select "Add custome..." from the list
+* Enter the file type's name
+* enter the file's extension
 
-If you have any requirements or dependencies, add a section describing those and how to install and configure them.
+![Add a new file type](https://raw.githubusercontent.com/buenon/scratchpads/master/images/scratchpad_add.gif)
+
+### Remove file types from the list
+* Run the command "Screatchpads: New scratchpad" from the Command Palette
+* Select "Remove..." from the list
+* Check the file types you wish to remove and hit enter
+
+![Remove file types](https://raw.githubusercontent.com/buenon/scratchpads/master/images/scratchpad_remove.gif)
+
+### Restore default file type list
+* Run the command "Screatchpads: New scratchpad" from the Command Palette
+* Select "Restore defaults..." from the list
+
+## Available Commands
+* New scratchpad (scratchpads.newScratchpad)
+* Remove scratchpad (scratchpads.removeScratchpad)
+
+## Keyboard Shortcuts
+You can find instructions on adding short cuts to the commands above on [VSCode website](https://code.visualstudio.com/docs/customization/keybindings).
 
 ## Extension Settings
 
-Include if your extension adds any VS Code settings through the `contributes.configuration` extension point.
-
-For example:
-
 This extension contributes the following settings:
 
-* `myExtension.enable`: enable/disable this extension
-* `myExtension.thing`: set to `blah` to do something
+* `scratchpads.promptForRemoval`: By default set to `true`. If set to `false` the user will not be prompted for confirmation when removing scratchpad files.
 
-## Known Issues
+## Source
 
-Calling out known issues can help limit users opening duplicate issues against your extension.
+[GitHub](https://github.com/buenon/scratchpads)
 
-## Release Notes
+## License
 
-Users appreciate release notes as you update your extension.
-
-### 1.0.0
-
-Initial release of ...
-
-### 1.0.1
-
-Fixed issue #.
-
-### 1.1.0
-
-Added features X, Y, and Z.
-
------------------------------------------------------------------------------------------------------------
-
-## Working with Markdown
-
-**Note:** You can author your README using Visual Studio Code.  Here are some useful editor keyboard shortcuts:
-
-* Split the editor (`Cmd+\` on macOS or `Ctrl+\` on Windows and Linux)
-* Toggle preview (`Shift+CMD+V` on macOS or `Shift+Ctrl+V` on Windows and Linux)
-* Press `Ctrl+Space` (Windows, Linux) or `Cmd+Space` (macOS) to see a list of Markdown snippets
-
-### For more information
-
-* [Visual Studio Code's Markdown Support](http://code.visualstudio.com/docs/languages/markdown)
-* [Markdown Syntax Reference](https://help.github.com/articles/markdown-basics/)
-
-**Enjoy!**
+[MIT](https://raw.githubusercontent.com/buenon/scratchpads/master/LICENSE)

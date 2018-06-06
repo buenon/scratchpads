@@ -41,10 +41,10 @@
         context = ctx;
         init();
 
-        let createCommand = commands.registerCommand('extension.newScratchpad', selectFileType);
+        let createCommand = commands.registerCommand('scratchpads.newScratchpad', selectFileType);
         context.subscriptions.push(createCommand);
 
-        let removeCommand = commands.registerCommand('extension.removeScratchpads', removeScratchpads);
+        let removeCommand = commands.registerCommand('scratchpads.removeScratchpads', removeScratchpads);
         context.subscriptions.push(removeCommand);
     }
 

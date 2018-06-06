@@ -11,8 +11,8 @@
         "Other"
     ],
     "activationEvents": [
-        "onCommand:extension.newScratchpad",
-        "onCommand:extension.removeScratchpads"
+        "onCommand:scratchpads.newScratchpad",
+        "onCommand:scratchpads.removeScratchpads"
     ],
     "main": "./src/extension",
     "contributes": {
@@ -28,11 +28,11 @@
             }
         },
         "commands": [{
-                "command": "extension.newScratchpad",
+                "command": "scratchpads.newScratchpad",
                 "title": "Scratchpads: New scratchpad"
             },
             {
-                "command": "extension.removeScratchpads",
+                "command": "scratchpads.removeScratchpads",
                 "title": "Scratchpads: Remove scratchpads"
             }
         ]
