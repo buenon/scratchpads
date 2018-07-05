@@ -15,6 +15,10 @@ Create multiple scratchpad files for doodling while you're coding.
 
 ![Create new Scratchpad](https://raw.githubusercontent.com/buenon/scratchpads/master/images/scratchpad_new.gif)
 
+### Re-open a closed scratchpad file
+* Run the command "Scratchpads: Open scratchpad" from the Command Palette
+* Select the file you wish to re-open
+
 ### Remove scratchpad files
 * Run the command "Scratchpads: Remove scratchpads" from the Command Palette
 
@@ -41,7 +45,8 @@ Create multiple scratchpad files for doodling while you're coding.
 
 ## Available Commands
 * New scratchpad (scratchpads.newScratchpad)
-* Remove scratchpad (scratchpads.removeScratchpad)
+* Remove scratchpads (scratchpads.removeScratchpads)
+* Open scratchpad (scratchpads.openScratchpad)
 
 ## Keyboard Shortcuts
 You can find instructions on adding short cuts to the commands above on [VSCode website](https://code.visualstudio.com/docs/customization/keybindings).

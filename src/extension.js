@@ -46,6 +46,9 @@
 
         let removeCommand = commands.registerCommand('scratchpads.removeScratchpads', removeScratchpads);
         context.subscriptions.push(removeCommand);
+
+        let openCommand = commands.registerCommand('scratchpads.openScratchpad', openScratchpad);
+        context.subscriptions.push(openCommand);
     }
 
     /**
@@ -360,7 +363,7 @@
             }
         });
     }
-    
+
     /**
      * Close all open tabs which edit a scratchpad document.
      * Use a "hack" which uses workbench actions (closeActiveEditor and nextEditor)
@@ -455,5 +458,31 @@
         if (!files.length) {
             fs.rmdirSync(projectScratchpadsPath);
         }
+    }
+
+    /**
+     * Re-open a scratchpad file
+     */
+    function openScratchpad() {
+        let files = fs.readdirSync(projectScratchpadsPath);
+
+        if (files.length == 0) {
+            window.showInformationMessage("No scratchpads to open");
+            return;
+        }
+
+        window.showQuickPick(files).then((selection) => {
+            if (!selection) {
+                return;
+            }
+
+            let filePath = path.join(projectScratchpadsPath, selection);
+
+            if (fs.existsSync(filePath)) {
+                vscode.workspace.openTextDocument(filePath).then(function (TextDocument) {
+                    vscode.window.showTextDocument(TextDocument, vscode.ViewColumn.One, false);
+                });
+            }
+        });
     }
 })();
