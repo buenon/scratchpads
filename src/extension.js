@@ -121,10 +121,28 @@
             fileTypes = context.globalState.get(FILE_TYPES_STATE);
         }
 
-        if (!fileTypes) {
-            fileTypes = JSON.parse(fs.readFileSync(fileTypesDB));
-            saveFileTypes();
+        let defaultFileTypes = JSON.parse(fs.readFileSync(fileTypesDB));
+
+        if (fileTypes) {
+            // In case of upgrade, keep previous types and add new types added to the new version
+            defaultFileTypes.forEach(fileType => {
+                if (fileType.ext) {
+                    let found = fileTypes.find((item) => {
+                        return fileType.ext === item.ext;
+                    });
+
+                    if (!found) {
+                        // Add the item before all popup's custom commands
+                        fileTypes.splice(fileTypes.length - 4, 0, fileType);
+                    }
+                }
+            });
         }
+        else {
+            fileTypes = defaultFileTypes;
+        }
+
+        saveFileTypes();
     }
 
     /**
