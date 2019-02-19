@@ -26,7 +26,6 @@
 
     let context;
     let configuration;
-    let basePath;
     let scratchpadsPath;
     let projectScratchpadsPath;
     let fileTypesDB;
@@ -62,18 +61,18 @@
      * Initialization
      */
     function init() {
-        let dedicatedPath = md5(vscode.env.appRoot);
+        let projectPathMD5 = md5(vscode.env.appRoot);
 
         configuration = vscode.workspace.getConfiguration('scratchpads');
-        basePath = context.extensionPath;
-        fileTypesDB = path.join(basePath, FILE_TYPES_DB);
-        scratchpadsPath = path.join(context.extensionPath, SCRATCHPADS_FOLDER);
+        fileTypesDB = path.join(context.extensionPath, FILE_TYPES_DB);
+        scratchpadsPath = path.join(context.globalStoragePath, SCRATCHPADS_FOLDER);
 
-        if (!fs.existsSync(scratchpadsPath)) {
+        if (!fs.existsSync(context.globalStoragePath)) {
+            fs.mkdirSync(context.globalStoragePath);
             fs.mkdirSync(scratchpadsPath);
         }
 
-        projectScratchpadsPath = path.join(scratchpadsPath, dedicatedPath);
+        projectScratchpadsPath = path.join(scratchpadsPath, projectPathMD5);
 
         if (!fs.existsSync(projectScratchpadsPath)) {
             fs.mkdirSync(projectScratchpadsPath);
@@ -81,9 +80,9 @@
 
         scratchpadPathRegex = escapeRegExp(
             path.join(
-                path.basename(context.extensionPath),
+                path.basename(context.globalStoragePath),
                 SCRATCHPADS_FOLDER,
-                dedicatedPath,
+                projectPathMD5,
                 FILE_NAME_TEMPLATE
             )
         );
