@@ -17,3 +17,10 @@
 ## 0.0.6
 * Dependencies update due to security vulnerabilities
 * Fixed [issue #7](https://github.com/buenon/scratchpads/issues/7) - Use new Global storage path
+
+## 0.0.7
+* Changelog updates
+* ***Important Note !!!***  
+    Prior to build 0.0.6, upgrading scratchpads will remove all previously created scratchpads.  
+    Assuming the old extension folder was not removed yet by vscode, you can attempt to retrieve the old scratchpads from %USERPROFILE%\\.vscode\\extensions\\buenon.scratchpads-<OLD_VERSION>\\scratchpads\\  
+    As of build 0.0.6 the new scratchpads location is %USERPROFILE%\\AppData\\Roaming\\Code\\User\\globalStorage\\buenon.scratchpads\\scratchpads\\

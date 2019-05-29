@@ -22,7 +22,7 @@ Create multiple scratchpad files for doodling while you're coding.
 ### Remove scratchpad files
 * Run the command "Scratchpads: Remove scratchpads" from the Command Palette
 
-*\* Removing scratchpad files loops through all the open tabs and closes the scratchpad ones before deleting the files (might seem wierd)*
+*\* Removing scratchpad files loops through all the open tabs and closes the scratchpad ones before deleting the files (might seem weird)*
 
 ### Add a new file type to the list
 * Run the command "Scratchpads: New scratchpad" from the Command Palette
