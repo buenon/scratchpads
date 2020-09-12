@@ -23,7 +23,8 @@
     ],
     "activationEvents": [
         "onCommand:scratchpads.newScratchpad",
-        "onCommand:scratchpads.removeScratchpads",
+        "onCommand:scratchpads.removeScratchpad",
+        "onCommand:scratchpads.removeAllScratchpads",
         "onCommand:scratchpads.openScratchpad"
     ],
     "main": "./src/extension",
@@ -45,8 +46,12 @@
                 "title": "Scratchpads: New scratchpad"
             },
             {
-                "command": "scratchpads.removeScratchpads",
-                "title": "Scratchpads: Remove scratchpads"
+                "command": "scratchpads.removeScratchpad",
+                "title": "Scratchpads: Remove a scratchpad"
+            },
+            {
+                "command": "scratchpads.removeAllScratchpads",
+                "title": "Scratchpads: Remove all scratchpads"
             },
             {
                 "command": "scratchpads.openScratchpad",
