@@ -319,20 +319,30 @@
     function createScratchpad(type) {
         let i = undefined;
         let ext = type.ext;
-        let filename = FILE_NAME_TEMPLATE + "." + ext;
-        let fullPath = path.join(projectScratchpadsPath, filename);
+        const inputOptions = {
+            placeHolder: "Enter a filename",
+            value: FILE_NAME_TEMPLATE
+        };
+        window.showInputBox(inputOptions).then(fileNameFromUser => {
+            if (!fileNameFromUser) {
+                fileNameFromUser = FILE_NAME_TEMPLATE;
+            }
+            
+            let filename = `${fileNameFromUser}.${ext}`;
+            let fullPath = path.join(projectScratchpadsPath, filename);
 
-        // Find an available filename
-        while (fs.existsSync(fullPath)) {
-            i = i ? i + 1 : 1;
-            filename = FILE_NAME_TEMPLATE + i + "." + ext;
-            fullPath = path.join(projectScratchpadsPath, filename);
-        }
+            // Find an available filename
+            while (fs.existsSync(fullPath)) {
+                i = i ? i + 1 : 1;
+                filename = FILE_NAME_TEMPLATE + i + "." + ext;
+                fullPath = path.join(projectScratchpadsPath, filename);
+            }
 
-        fs.writeFileSync(fullPath, "");
+            fs.writeFileSync(fullPath, "");
 
-        vscode.workspace.openTextDocument(fullPath).then(doc => {
-            window.showTextDocument(doc);
+            vscode.workspace.openTextDocument(fullPath).then(doc => {
+                window.showTextDocument(doc);
+            });
         });
     }
 
@@ -457,10 +467,7 @@
         let files = fs.readdirSync(projectScratchpadsPath);
 
         for (var i = 0, len = files.length; i < len; i++) {
-            var match = files[i].match(FILE_NAME_TEMPLATE + ".*");
-            if (match !== null) {
-                fs.unlinkSync(path.join(projectScratchpadsPath, match[0]));
-            }
+            fs.unlinkSync(path.join(projectScratchpadsPath, match[0]));
         }
 
         window.showInformationMessage("Removed all scratchpads");
