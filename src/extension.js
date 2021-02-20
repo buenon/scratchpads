@@ -320,8 +320,7 @@
         let i = undefined;
         let ext = type.ext;
         const inputOptions = {
-            placeHolder: "Enter a filename",
-            value: FILE_NAME_TEMPLATE
+            placeHolder: "Enter a filename"
         };
         window.showInputBox(inputOptions).then(fileNameFromUser => {
             if (!fileNameFromUser) {
