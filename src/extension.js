@@ -330,7 +330,7 @@
             // Find an available filename
             while (fs.existsSync(fullPath)) {
                 i = i ? i + 1 : 1;
-                filename = FILE_NAME_TEMPLATE + i + "." + ext;
+                filename = `${fileNameFromUser}${i}.${ext}`;
                 fullPath = path.join(projectScratchpadsPath, filename);
             }
 
