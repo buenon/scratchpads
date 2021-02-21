@@ -463,7 +463,7 @@
         let files = fs.readdirSync(projectScratchpadsPath);
 
         for (var i = 0, len = files.length; i < len; i++) {
-            fs.unlinkSync(path.join(projectScratchpadsPath, match[0]));
+            fs.unlinkSync(path.join(projectScratchpadsPath, files[i]));
         }
 
         window.showInformationMessage("Removed all scratchpads");
