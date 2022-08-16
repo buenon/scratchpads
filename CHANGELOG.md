@@ -24,3 +24,7 @@
     Prior to build 0.0.6, upgrading scratchpads will remove all previously created scratchpads.  
     Assuming the old extension folder was not removed yet by vscode, you can attempt to retrieve the old scratchpads from %USERPROFILE%\\.vscode\\extensions\\buenon.scratchpads-<OLD_VERSION>\\scratchpads\\  
     As of build 0.0.6 the new scratchpads location is %USERPROFILE%\\AppData\\Roaming\\Code\\User\\globalStorage\\buenon.scratchpads\\scratchpads\\
+
+## 0.0.8
+- [PR #17](https://github.com/buenon/scratchpads/pull/17) - [@omeryagmurlu](https://github.com/omeryagmurlu) - Added remove single scratchpad feature
+- [PR #19](https://github.com/buenon/scratchpads/pull/19) - [@nobodyme](https://github.com/nobodyme) - Create scratchpads with custom file names
