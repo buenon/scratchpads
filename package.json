@@ -2,7 +2,7 @@
     "name": "scratchpads",
     "displayName": "Scratchpads",
     "description": "Create multiple scratchpad files of different file types",
-    "version": "0.0.7",
+    "version": "0.0.8",
     "publisher": "buenon",
     "author": {
         "name": "Nadav Bueno",
