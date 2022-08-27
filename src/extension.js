@@ -108,7 +108,7 @@
     }
 
     /**
-     * Load the file types
+     * Load the file types based on https://github.com/blakeembrey/language-map
      */
     function loadFileTypes() {
         recentFileTypes = context.globalState.get(RECENT_FILE_TYPES_STATE) || [];
@@ -153,11 +153,17 @@
             []
         );
 
-        mainFileTypes.sort(sortTypes);
-        additionalFileTypes.sort(sortTypes);
+        mainFileTypes.sort(fileTypesCompareFn);
+        additionalFileTypes.sort(fileTypesCompareFn);
     }
 
-    function sortTypes(a, b) {
+    /**
+     * Compare function for sorting file types array (used in sort())
+     * @param a The first element for comparison.
+     * @param b The second element for comparison.
+     * @returns '-1/0/1' based on the extension string
+     */
+    function fileTypesCompareFn(a, b) {
         return a.name.toLowerCase().localeCompare(b.name.toLowerCase());
     }
 
@@ -165,7 +171,7 @@
      * Add the given file type to the recent array
      * @param {object} typeToAdd
      */
-    function addTypeToRecents(typeToAdd) {
+    function addTypeToRecentFileTypes(typeToAdd) {
         if (!recentFileTypes.length || recentFileTypes[0].ext !== typeToAdd.ext) {
             recentFileTypes = recentFileTypes.filter(type => {
                 return type.ext !== typeToAdd.ext;
@@ -177,18 +183,29 @@
         }
     }
 
-    function addFileTypeOptionsToSection(sectionTitle, typeToAdd) {
+    /**
+     * Add an array of file types to the fileTypesOptions to be used in QuickPick.
+     * It will also add a QuickPickItemKind.Separator with the given title
+     * @param sectionTitle The title to the section
+     * @param typesToAdd The types array
+     */
+    function addFileTypeOptionsToSection(sectionTitle, typesToAdd) {
         fileTypesOptions.push({
             label: sectionTitle,
             kind: vscode.QuickPickItemKind.Separator
         });
 
-        for (const type of typeToAdd) {
+        for (const type of typesToAdd) {
             fileTypesOptions.push({ label: `${type.name} (${type.ext})`, type });
         }
     }
 
-    function filterOutRecents(items) {
+    /**
+     * Remove all items that already exist in the recentFileTypes array from the given array
+     * @param items The array to filter
+     * @returns The filtered array
+     */
+    function filterOutRecentFileTypes(items) {
         return items.filter(item => !recentFileTypes.find(recent => recent.ext === item.ext));
     }
 
@@ -201,8 +218,8 @@
 
             addFileTypeOptionsToSection("Recent", recentFileTypes);
             addFileTypeOptionsToSection("File types", [
-                ...filterOutRecents(mainFileTypes),
-                ...filterOutRecents(additionalFileTypes),
+                ...filterOutRecentFileTypes(mainFileTypes),
+                ...filterOutRecentFileTypes(additionalFileTypes),
             ]);
 
             isFileTypesDirty = false;
@@ -213,7 +230,7 @@
                 return;
             }
 
-            addTypeToRecents(selection.type);
+            addTypeToRecentFileTypes(selection.type);
             createScratchpad(selection.type.ext);
         });
     }
