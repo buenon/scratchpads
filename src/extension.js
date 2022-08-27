@@ -2,11 +2,6 @@
     exports.activate = activate;
     exports.deactivate = deactivate;
 
-    // Exports for file types functions
-    exports.addNewFileType = addNewFileType;
-    exports.removeFileType = removeFileType;
-    exports.restoreDefaultFileTypes = restoreDefaultFileTypes;
-
     // The module 'vscode' contains the VS Code extensibility API
     // Import the module and reference it with the alias vscode in your code below
     const fs = require('fs');
@@ -15,12 +10,13 @@
     const window = vscode.window;
     const commands = vscode.commands;
     const md5 = require('md5');
+    const langMap = require('language-map');
+
 
     "use strict";
     const SCRATCHPADS_FOLDER = "scratchpads";
     const FILE_NAME_TEMPLATE = "scratch";
-    const FILE_TYPES_DB = "typesConfig.json";
-    const FILE_TYPES_STATE = "fileTypesState";
+    const RECENT_FILE_TYPES_STATE = "recentFileTypesState";
     const ACTIONS_TIMEOUT = 500; // Need to pause a bit when changing or closing the active tab 
     const PROMPT_FOR_REMOVAL = "promptForRemoval";
 
@@ -28,11 +24,12 @@
     let configuration;
     let scratchpadsPath;
     let projectScratchpadsPath;
-    let fileTypesDB;
-    let fileTypes;
+    let mainFileTypes;
+    let additionalFileTypes;
+    let recentFileTypes;
+    let fileTypesOptions;
+    let isFileTypesDirty = false;
     let scratchpadPathRegex;
-
-    let app = this;
 
     // this method is called when your extension is activated
     // your extension is activated the very first time the command is executed
@@ -67,7 +64,6 @@
         let projectPathMD5 = md5(vscode.env.appRoot);
 
         configuration = vscode.workspace.getConfiguration('scratchpads');
-        fileTypesDB = path.join(context.extensionPath, FILE_TYPES_DB);
         scratchpadsPath = path.join(context.globalStoragePath, SCRATCHPADS_FOLDER);
 
         if (!fs.existsSync(context.globalStoragePath)) {
@@ -112,158 +108,102 @@
     }
 
     /**
-     * Load the file types DB
+     * Load the file types
      */
-    function loadFileTypes(isReload = false) {
-        if (isReload) {
-            fileTypes = undefined;
-        }
-        else {
-            fileTypes = context.globalState.get(FILE_TYPES_STATE);
-        }
+    function loadFileTypes() {
+        recentFileTypes = context.globalState.get(RECENT_FILE_TYPES_STATE) || [];
+        mainFileTypes = [];
+        additionalFileTypes = [];
 
-        let defaultFileTypes = JSON.parse(fs.readFileSync(fileTypesDB));
+        for (const [name, data] of Object.entries(langMap)) {
+            if (data.extensions) {
+                mainFileTypes.push({
+                    name,
+                    ext: data.extensions.shift(),
+                });
 
-        if (fileTypes) {
-            // In case of upgrade, keep previous types and add new types added to the new version
-            defaultFileTypes.forEach(fileType => {
-                if (fileType.ext) {
-                    let found = fileTypes.find((item) => {
-                        return fileType.ext === item.ext;
-                    });
+                for (let ext of data.extensions) {
+                    // Remove extensions with multiple dots (E.G. .rest.txt)
+                    ext = ext.substring(ext.lastIndexOf("."));
+
+                    const found =
+                        mainFileTypes.find(e => e.ext === ext) ||
+                        additionalFileTypes.find(e => e.ext === ext);
 
                     if (!found) {
-                        // Add the item before all popup's custom commands
-                        fileTypes.splice(fileTypes.length - 4, 0, fileType);
+                        const name = ext.substring(1).toUpperCase();
+                        additionalFileTypes.push({
+                            name,
+                            ext,
+                        });
                     }
                 }
+            }
+        }
+
+        mainFileTypes.sort(sortTypes);
+        additionalFileTypes.sort(sortTypes);
+    }
+
+    function sortTypes(a, b) {
+        return a.name.toLowerCase().localeCompare(b.name.toLowerCase());
+    }
+
+    /**
+     * Add the given file type to the recent array
+     * @param {object} typeToAdd
+     */
+    function addTypeToRecents(typeToAdd) {
+        if (!recentFileTypes.length || recentFileTypes[0].ext !== typeToAdd.ext) {
+            recentFileTypes = recentFileTypes.filter(type => {
+                return type.ext !== typeToAdd.ext;
             });
-        }
-        else {
-            fileTypes = defaultFileTypes;
-        }
 
-        saveFileTypes();
-    }
-
-    /**
-     * Save the file types DB
-     */
-    function saveFileTypes() {
-        context.globalState.update(FILE_TYPES_STATE, fileTypes);
-    }
-
-    /**
-     * Move the element at the given index to the top of the array
-     * in order to keep the last selection at the top of the list
-     * @param {number} index The index of the element to move
-     */
-    function reorderFileTypes(index) {
-        if (index !== 0) {
-            fileTypes.splice(0, 0, fileTypes.splice(index, 1)[0]);
-            saveFileTypes();
+            recentFileTypes.unshift(typeToAdd);
+            context.globalState.update(RECENT_FILE_TYPES_STATE, recentFileTypes);
+            isFileTypesDirty = true;
         }
     }
 
-    /**
-     * Select the type of the scratchpad file 
-     */
-    function selectFileType() {
-        let items = [];
-
-        fileTypes.map((item, i) => {
-            items.push({ label: item.type, index: i });
+    function addFileTypeOptionsToSection(sectionTitle, typeToAdd) {
+        fileTypesOptions.push({
+            label: sectionTitle,
+            kind: vscode.QuickPickItemKind.Separator
         });
 
-        window.showQuickPick(items).then((selection) => {
+        for (const type of typeToAdd) {
+            fileTypesOptions.push({ label: `${type.name} (${type.ext})`, type });
+        }
+    }
+
+    function filterOutRecents(items) {
+        return items.filter(item => !recentFileTypes.find(recent => recent.ext === item.ext));
+    }
+
+    /**
+     * Select the type of the scratchpad file
+     */
+    function selectFileType() {
+        if (!fileTypesOptions || isFileTypesDirty) {
+            fileTypesOptions = [];
+
+            addFileTypeOptionsToSection("Recent", recentFileTypes);
+            addFileTypeOptionsToSection("File types", [
+                ...filterOutRecents(mainFileTypes),
+                ...filterOutRecents(additionalFileTypes),
+            ]);
+
+            isFileTypesDirty = false;
+        }
+
+        window.showQuickPick(fileTypesOptions).then((selection) => {
             if (!selection) {
                 return;
             }
 
-            let type = fileTypes[selection.index];
-
-            if (type.func) {
-                app[type.func]();
-            }
-            else if (type.ext) {
-                reorderFileTypes(selection.index);
-                createScratchpad(fileTypes[0]);
-            }
+            addTypeToRecents(selection.type);
+            createScratchpad(selection.type.ext);
         });
-    }
-
-    /**
-     * Add a new file type to the DB
-     * Validation will fail if the file type's name or extension already exists
-     */
-    function addNewFileType() {
-        let type, ext;
-
-        getUserInput("Enter file type name:")
-            .then(val => {
-                type = val;
-                return validate("type", type);
-            })
-            .then(() => {
-                return getUserInput("Enter file extension:");
-            })
-            .then(val => {
-                ext = val;
-                return validate("ext", ext);
-            })
-            .then(() => {
-                fileTypes.unshift({ type: type, ext: ext });
-                saveFileTypes();
-                createScratchpad(fileTypes[0]);
-            })
-            .catch(err => {
-                window.showErrorMessage(err.message);
-            });
-        ;
-    }
-
-    /**
-     * Remove file types from the list
-     */
-    function removeFileType() {
-        let items = [];
-
-        fileTypes.map((item, i) => {
-            if (item.ext) {
-                items.push({ label: item.type, index: i });
-            }
-        });
-
-        window.showQuickPick(items, { canPickMany: true }).then((selection) => {
-            if (!selection || !selection.length) {
-                return;
-            }
-
-            selection.sort((a, b) => {
-                return b.index - a.index;
-            });
-
-            let labels = selection.map((item) => {
-                fileTypes.splice(item.index, 1);
-                return item.label;
-            });
-
-            window.showInformationMessage(`Removed  file type${labels.length > 1 ? "s" : ""}: '${labels.join("', '")}'`);
-
-            saveFileTypes();
-        });
-    }
-
-    /**
-     * Restore the default list of file types
-     */
-    function restoreDefaultFileTypes() {
-        window.showWarningMessage("Are you sure you want to restore default file types?", { modal: true }, "Yes")
-            .then(answer => {
-                if (answer) {
-                    loadFileTypes(true);
-                }
-            });
     }
 
     /**
@@ -283,57 +223,26 @@
     }
 
     /**
-     * Validate that the file type or extension do not exist in the DB
-     * @param {string} key Either "type" or "ext"
-     * @param {string} val The value to validate
-     */
-    function validate(key, val) {
-        return new Promise((resolve) => {
-            if (!val) {
-                return;
-            }
-
-            let msg;
-            let found = fileTypes.some(item => {
-                if (item[key] && item[key].toLowerCase() === val.toLowerCase()) {
-                    msg = `File type already exist {type: ${item.type}, ext: ${item.ext}}`;
-                    return true;
-                }
-
-                return false;
-            });
-
-            if (found) {
-                throw new Error(msg);
-            }
-            else {
-                resolve();
-            }
-        });
-    }
-
-    /**
      * Create a new scratchpad file
      * If file name exists increment counter until a new file can be created
      * 
-     * @param {Object} type The file type object
+     * @param {string} ext The file extension
      */
-    function createScratchpad(type) {
+    function createScratchpad(ext) {
         let i = undefined;
-        let ext = type.ext;
-        
+
         getUserInput("Enter a filename:").then(fileNameFromUser => {
             if (!fileNameFromUser) {
                 fileNameFromUser = FILE_NAME_TEMPLATE;
             }
-            
-            let filename = `${fileNameFromUser}.${ext}`;
+
+            let filename = `${fileNameFromUser}${ext}`;
             let fullPath = path.join(projectScratchpadsPath, filename);
 
             // Find an available filename
             while (fs.existsSync(fullPath)) {
                 i = i ? i + 1 : 1;
-                filename = `${fileNameFromUser}${i}.${ext}`;
+                filename = `${fileNameFromUser}${i}${ext}`;
                 fullPath = path.join(projectScratchpadsPath, filename);
             }
 
@@ -365,7 +274,7 @@
     function removeScratchpad() {
         let files = fs.readdirSync(projectScratchpadsPath);
 
-        if (files.length == 0) {
+        if (!files.length) {
             window.showInformationMessage("No scratchpads to delete");
             return;
         }
@@ -511,7 +420,7 @@
     function openScratchpad() {
         let files = fs.readdirSync(projectScratchpadsPath);
 
-        if (files.length == 0) {
+        if (!files.length) {
             window.showInformationMessage("No scratchpads to open");
             return;
         }
