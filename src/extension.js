@@ -91,7 +91,7 @@
     /**
      * Source reference: https://stackoverflow.com/a/6969486/1324724
      * We need to escape special characters when using string.match()
-     * 
+     *
      * @param {string} str Regex string to escape
      */
     function escapeRegExp(str) {
@@ -100,7 +100,7 @@
 
     /**
      * Checks if the given tab is holding a scratchpad document
-     * 
+     *
      * @param {TextEditor} editor The tab to inspect
      */
     function isScratchpadEditor(editor) {
@@ -122,24 +122,36 @@
                     ext: data.extensions.shift(),
                 });
 
-                for (let ext of data.extensions) {
-                    // Remove extensions with multiple dots (E.G. .rest.txt)
-                    ext = ext.substring(ext.lastIndexOf("."));
-
-                    const found =
-                        mainFileTypes.find(e => e.ext === ext) ||
-                        additionalFileTypes.find(e => e.ext === ext);
-
-                    if (!found) {
-                        const name = ext.substring(1).toUpperCase();
-                        additionalFileTypes.push({
-                            name,
-                            ext,
-                        });
+                for (const ext of data.extensions) {
+                    // Skip extensions with multiple dots (E.G. .rest.txt)
+                    if (ext.lastIndexOf(".") > 0) {
+                        continue;
                     }
+
+                    const name = ext.substring(1).toUpperCase();
+                    additionalFileTypes.push({
+                        name,
+                        ext,
+                    });
                 }
             }
         }
+
+        // Remove duplicate extensions from additionalFileTypes
+        additionalFileTypes = additionalFileTypes.reduce(
+            (newArray, currentType) => {
+                const found =
+                    mainFileTypes.find(type => type.ext === currentType.ext) ||
+                    newArray.find(type => type.ext === currentType.ext);
+
+                if (!found) {
+                    newArray.push(currentType);
+                }
+
+                return newArray;
+            },
+            []
+        );
 
         mainFileTypes.sort(sortTypes);
         additionalFileTypes.sort(sortTypes);
@@ -225,7 +237,7 @@
     /**
      * Create a new scratchpad file
      * If file name exists increment counter until a new file can be created
-     * 
+     *
      * @param {string} ext The file extension
      */
     function createScratchpad(ext) {
@@ -314,8 +326,7 @@
                     }, err => {
                         reject(err);
                     });
-            }
-            else {
+            } else {
                 resolve();
             }
         });
@@ -354,8 +365,7 @@
             }
 
             console.log("Back to initial tab. Stopping operation...");
-        }
-        else {
+        } else {
             console.log("No open tabs");
         }
     }
