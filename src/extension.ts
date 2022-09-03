@@ -1,25 +1,34 @@
-// The module 'vscode' contains the VS Code extensibility API
-// Import the module and reference it with the alias vscode in your code below
 import * as vscode from 'vscode';
+import { Config } from './config';
+import { FiletypesManager } from './filetypes.manager';
+import { ScratchpadsManager } from './scratchpads.manager';
+import Utils from './utils';
 
-// this method is called when your extension is activated
-// your extension is activated the very first time the command is executed
+/**
+ * This method is called when the extension is activated
+ * Good place for initialization.
+ */
 export function activate(context: vscode.ExtensionContext) {
-  // Use the console to output diagnostic information (console.log) and errors (console.error)
-  // This line of code will only be executed once when your extension is activated
-  console.log('Congratulations, your extension "scratchpads-ts" is now active!');
+  Config.init(context);
+  Utils.createFolders();
 
-  // The command has been defined in the package.json file
-  // Now provide the implementation of the command with registerCommand
-  // The commandId parameter must match the command field in package.json
-  let disposable = vscode.commands.registerCommand('scratchpads-ts.helloWorld', () => {
-    // The code you place here will be executed every time your command is executed
-    // Display a message box to the user
-    vscode.window.showInformationMessage('Hello World from scratchpads-ts!');
-  });
+  const scratchpadsManager = new ScratchpadsManager(new FiletypesManager());
 
-  context.subscriptions.push(disposable);
+  const commands: { [key: string]: (...args: any[]) => any } = {
+    'scratchpads.newScratchpad': () => scratchpadsManager.createScratchpad(),
+    'scratchpads.openScratchpad': () => scratchpadsManager.openScratchpad(),
+    'scratchpads.removeAllScratchpads': () => scratchpadsManager.removeAllScratchpads(),
+    'scratchpads.removeScratchpad': () => scratchpadsManager.removeScratchpad(),
+  };
+
+  for (const command in commands) {
+    const cmd = vscode.commands.registerCommand(command, commands[command]);
+    context.subscriptions.push(cmd);
+  }
 }
 
-// this method is called when your extension is deactivated
+/**
+ * This method is called when the extension is deactivated.
+ * Good place for cleanups.
+ */
 export function deactivate() {}
