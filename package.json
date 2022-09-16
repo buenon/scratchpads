@@ -33,6 +33,10 @@
       "type": "object",
       "title": "Scratchpads",
       "properties": {
+        "scratchpads.scratchpadsFolder": {
+          "type": "string",
+          "description": "A custom full path in which the scratchpads will be stored (leave empty for global extension folder)"
+        },
         "scratchpads.promptForRemoval": {
           "type": "boolean",
           "default": true,

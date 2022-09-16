@@ -69,7 +69,7 @@ export class ScratchpadsManager {
    * Re-open a scratchpad file
    */
   public async openScratchpad() {
-    let files = fs.readdirSync(Config.projectScratchpadsPath);
+    const files = fs.readdirSync(Config.projectScratchpadsPath);
 
     if (!files.length) {
       window.showInformationMessage('No scratchpads to open');
@@ -81,7 +81,7 @@ export class ScratchpadsManager {
       return;
     }
 
-    let filePath = path.join(Config.projectScratchpadsPath, selection);
+    const filePath = path.join(Config.projectScratchpadsPath, selection);
 
     if (fs.existsSync(filePath)) {
       const doc = await vscode.workspace.openTextDocument(filePath);
@@ -93,7 +93,7 @@ export class ScratchpadsManager {
    * Remove a single scratchpad file
    */
   public async removeScratchpad() {
-    let files = fs.readdirSync(Config.projectScratchpadsPath);
+    const files = fs.readdirSync(Config.projectScratchpadsPath);
 
     if (!files.length) {
       window.showInformationMessage('No scratchpads to delete');
@@ -105,7 +105,7 @@ export class ScratchpadsManager {
       return;
     }
 
-    let filePath = path.join(Config.projectScratchpadsPath, selection);
+    const filePath = path.join(Config.projectScratchpadsPath, selection);
     fs.unlinkSync(filePath);
 
     window.showInformationMessage(`Removed ${selection}`);
@@ -225,7 +225,7 @@ export class ScratchpadsManager {
   private deleteScratchpadFiles() {
     console.log('Deleting scratchpad files');
 
-    let files = fs.readdirSync(Config.projectScratchpadsPath);
+    const files = fs.readdirSync(Config.projectScratchpadsPath);
 
     for (let i = 0, len = files.length; i < len; i++) {
       fs.unlinkSync(path.join(Config.projectScratchpadsPath, files[i]));

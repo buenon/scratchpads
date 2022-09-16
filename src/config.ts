@@ -1,14 +1,16 @@
-import * as vscode from 'vscode';
-import { Md5 } from 'ts-md5';
 import * as path from 'path';
-import { SCRATCHPADS_FOLDER } from './consts';
+import { Md5 } from 'ts-md5';
+import * as vscode from 'vscode';
+import { CONFIG_SCRATCHPADS_FOLDER, SCRATCHPADS_FOLDER_NAME } from './consts';
 
 export class Config {
   public static context: vscode.ExtensionContext;
   public static extensionConfig: vscode.WorkspaceConfiguration;
+
   public static globalPath: string;
+  public static customPath: string;
+  public static scratchpadsRootPath: string;
   public static projectPathMD5: string;
-  public static scratchpadsPath: string;
   public static projectScratchpadsPath: string;
 
   public static init(context: vscode.ExtensionContext) {
@@ -16,8 +18,14 @@ export class Config {
     this.extensionConfig = vscode.workspace.getConfiguration('scratchpads');
     this.projectPathMD5 = Md5.hashStr(vscode.env.appRoot);
     this.globalPath = context.globalStorageUri.fsPath;
-    this.scratchpadsPath = path.join(this.globalPath, SCRATCHPADS_FOLDER);
-    this.projectScratchpadsPath = path.join(this.scratchpadsPath, this.projectPathMD5);
+    this.recalculateProjectScratchpadsPath();
+  }
+
+  public static recalculateProjectScratchpadsPath() {
+    this.customPath = this.getExtensionConfiguration(CONFIG_SCRATCHPADS_FOLDER) as string;
+
+    this.scratchpadsRootPath = path.join(this.customPath || this.globalPath, SCRATCHPADS_FOLDER_NAME);
+    this.projectScratchpadsPath = path.join(this.scratchpadsRootPath, this.projectPathMD5);
   }
 
   /**
