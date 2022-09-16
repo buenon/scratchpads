@@ -28,4 +28,14 @@ export class Config {
     const config = this.extensionConfig.inspect(key);
     return config?.globalValue !== undefined ? config.globalValue : config?.defaultValue;
   }
+
+  /**
+   * Set an extension configuration based on the given key and value.
+   * The configuration will be saved on the global target.
+   * @param key
+   * @param value
+   */
+  public static setExtensionConfiguration(key: string, value: any) {
+    this.extensionConfig.update(key, value, true);
+  }
 }

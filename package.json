@@ -38,6 +38,11 @@
           "default": true,
           "description": "Prompt the user when removing scratchpads"
         },
+        "scratchpads.promptForFilename": {
+          "type": "boolean",
+          "default": false,
+          "description": "Prompt the user for a file name when creating a new scratchpad"
+        },
         "scratchpads.autoPaste": {
           "type": "boolean",
           "default": true,

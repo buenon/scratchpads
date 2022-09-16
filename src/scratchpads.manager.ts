@@ -3,7 +3,13 @@ import * as path from 'path';
 import * as vscode from 'vscode';
 import { window } from 'vscode';
 import { Config } from './config';
-import { CONFIG_AUTO_FORMAT, CONFIG_AUTO_PASTE, CONFIG_PROMPT_FOR_REMOVAL, FILE_NAME_TEMPLATE } from './consts';
+import {
+  CONFIG_AUTO_FORMAT,
+  CONFIG_AUTO_PASTE,
+  CONFIG_PROMPT_FOR_FILENAME,
+  CONFIG_PROMPT_FOR_REMOVAL,
+  FILE_NAME_TEMPLATE,
+} from './consts';
 import { FiletypesManager } from './filetypes.manager';
 import Utils from './utils';
 
@@ -23,20 +29,25 @@ export class ScratchpadsManager {
 
     if (filetype) {
       let i = 0;
+      let baseFilename = FILE_NAME_TEMPLATE;
+      const isPromptForFilename = Config.getExtensionConfiguration(CONFIG_PROMPT_FOR_FILENAME);
 
-      let fileNameFromUser = await window.showInputBox({ placeHolder: 'Enter a filename:' });
-      if (!fileNameFromUser) {
-        fileNameFromUser = FILE_NAME_TEMPLATE;
+      if (isPromptForFilename) {
+        const filenameFromUser = await window.showInputBox({ placeHolder: 'Enter a filename:' });
+
+        if (filenameFromUser) {
+          baseFilename = filenameFromUser;
+        }
       }
 
-      let filename = `${fileNameFromUser}${filetype.ext}`;
-      let fullPath = path.join(Config.projectScratchpadsPath, filename);
+      let finalFilename = `${baseFilename}${filetype.ext}`;
+      let fullPath = path.join(Config.projectScratchpadsPath, finalFilename);
 
       // Find an available filename
       while (fs.existsSync(fullPath)) {
         i = i + 1;
-        filename = `${fileNameFromUser}${i}${filetype.ext}`;
-        fullPath = path.join(Config.projectScratchpadsPath, filename);
+        finalFilename = `${baseFilename}${i}${filetype.ext}`;
+        fullPath = path.join(Config.projectScratchpadsPath, finalFilename);
       }
 
       const isAutoPaste = Config.getExtensionConfiguration(CONFIG_AUTO_PASTE);
@@ -134,7 +145,7 @@ export class ScratchpadsManager {
    * If the user previously clicked on "Always" no need to prompt, and we can go ahead and remote them.
    */
   private async confirmRemoval() {
-    const isPromptForRemoval = Config.extensionConfig.inspect(CONFIG_PROMPT_FOR_REMOVAL)?.globalValue;
+    const isPromptForRemoval = Config.getExtensionConfiguration(CONFIG_PROMPT_FOR_REMOVAL);
 
     if (isPromptForRemoval === undefined || isPromptForRemoval) {
       const answer = await window.showWarningMessage(
@@ -149,7 +160,7 @@ export class ScratchpadsManager {
       }
 
       if (answer === 'Always') {
-        Config.extensionConfig.update(CONFIG_PROMPT_FOR_REMOVAL, false, true);
+        Config.setExtensionConfiguration(CONFIG_PROMPT_FOR_REMOVAL, false);
       }
     }
 
