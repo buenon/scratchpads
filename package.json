@@ -31,12 +31,22 @@
   "contributes": {
     "configuration": {
       "type": "object",
-      "title": "Scratchpads configuration",
+      "title": "Scratchpads",
       "properties": {
         "scratchpads.promptForRemoval": {
           "type": "boolean",
           "default": true,
           "description": "Prompt the user when removing scratchpads"
+        },
+        "scratchpads.autoPaste": {
+          "type": "boolean",
+          "default": true,
+          "description": "Automatically paste clipboard content into the new scratchpad"
+        },
+        "scratchpads.autoFormat": {
+          "type": "boolean",
+          "default": true,
+          "description": "Automatically format the new scratchpad content (works only if auto paste is on)"
         }
       }
     },

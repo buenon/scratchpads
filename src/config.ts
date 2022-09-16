@@ -19,4 +19,13 @@ export class Config {
     this.scratchpadsPath = path.join(this.globalPath, SCRATCHPADS_FOLDER);
     this.projectScratchpadsPath = path.join(this.scratchpadsPath, this.projectPathMD5);
   }
+
+  /**
+   * Get the extension configuration (exposed in package.json) for the given key
+   * @param key
+   */
+  public static getExtensionConfiguration(key: string) {
+    const config = this.extensionConfig.inspect(key);
+    return config?.globalValue !== undefined ? config.globalValue : config?.defaultValue;
+  }
 }
