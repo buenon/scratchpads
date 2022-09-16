@@ -25,7 +25,8 @@
     "onCommand:scratchpads.newScratchpad",
     "onCommand:scratchpads.removeScratchpad",
     "onCommand:scratchpads.removeAllScratchpads",
-    "onCommand:scratchpads.openScratchpad"
+    "onCommand:scratchpads.openScratchpad",
+    "onCommand:scratchpads.newFiletype"
   ],
   "main": "./dist/extension.js",
   "contributes": {
@@ -35,12 +36,12 @@
       "properties": {
         "scratchpads.scratchpadsFolder": {
           "type": "string",
-          "description": "A custom full path in which the scratchpads will be stored (leave empty for global extension folder)"
+          "description": "A custom full path in which the scratchpads will be stored (Note: Data will not be moved)."
         },
         "scratchpads.promptForRemoval": {
           "type": "boolean",
           "default": true,
-          "description": "Prompt the user when removing scratchpads"
+          "description": "Prompt the user when removing all scratchpads"
         },
         "scratchpads.promptForFilename": {
           "type": "boolean",
@@ -75,6 +76,10 @@
       {
         "command": "scratchpads.openScratchpad",
         "title": "Scratchpads: Open scratchpad"
+      },
+      {
+        "command": "scratchpads.newFiletype",
+        "title": "Scratchpads: New filetype"
       }
     ]
   },

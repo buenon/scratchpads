@@ -18,6 +18,7 @@ export function activate(context: vscode.ExtensionContext) {
     'scratchpads.openScratchpad': () => Utils.confirmFolder() && scratchpadsManager.openScratchpad(),
     'scratchpads.removeAllScratchpads': () => Utils.confirmFolder() && scratchpadsManager.removeAllScratchpads(),
     'scratchpads.removeScratchpad': () => Utils.confirmFolder() && scratchpadsManager.removeScratchpad(),
+    'scratchpads.newFiletype': () => Utils.confirmFolder() && scratchpadsManager.newFiletype(),
   };
 
   for (const command in commands) {
@@ -29,7 +30,7 @@ export function activate(context: vscode.ExtensionContext) {
     const affected = event.affectsConfiguration('scratchpads.scratchpadsFolder');
 
     if (affected) {
-      Config.recalculateProjectScratchpadsPath();
+      Config.recalculatePaths();
     }
   });
 }

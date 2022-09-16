@@ -10,7 +10,7 @@ import {
   CONFIG_PROMPT_FOR_REMOVAL,
   FILE_NAME_TEMPLATE,
 } from './consts';
-import { FiletypesManager } from './filetypes.manager';
+import { Filetype, FiletypesManager } from './filetypes.manager';
 import Utils from './utils';
 
 export class ScratchpadsManager {
@@ -24,8 +24,10 @@ export class ScratchpadsManager {
    * Create a new scratchpad file
    * If file name exists increment counter until a new file can be created
    */
-  public async createScratchpad() {
-    const filetype = await this.filetypeManager.selectFiletype();
+  public async createScratchpad(filetype?: Filetype) {
+    if (!filetype) {
+      filetype = await this.filetypeManager.selectFiletype();
+    }
 
     if (filetype) {
       let i = 0;
@@ -33,7 +35,9 @@ export class ScratchpadsManager {
       const isPromptForFilename = Config.getExtensionConfiguration(CONFIG_PROMPT_FOR_FILENAME);
 
       if (isPromptForFilename) {
-        const filenameFromUser = await window.showInputBox({ placeHolder: 'Enter a filename:' });
+        const filenameFromUser = await window.showInputBox({
+          placeHolder: 'Enter a filename:',
+        });
 
         if (filenameFromUser) {
           baseFilename = filenameFromUser;
@@ -122,6 +126,14 @@ export class ScratchpadsManager {
   }
 
   /**
+   * Add a new Filetype
+   */
+  public async newFiletype() {
+    const newFileType = await this.filetypeManager.newFiletype();
+    newFileType && (await this.createScratchpad(newFileType));
+  }
+
+  /**
    * Automatically format the text inside the given document
    * @param doc the document to format
    */
@@ -133,11 +145,13 @@ export class ScratchpadsManager {
       docUri,
     )) as vscode.TextEdit[];
 
-    for (const textEdit of textEdits) {
-      edit.replace(docUri, textEdit.range, textEdit.newText);
-    }
+    if (textEdits) {
+      for (const textEdit of textEdits) {
+        edit.replace(docUri, textEdit.range, textEdit.newText);
+      }
 
-    await vscode.workspace.applyEdit(edit);
+      await vscode.workspace.applyEdit(edit);
+    }
   }
 
   /**
