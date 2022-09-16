@@ -3,8 +3,14 @@ import * as path from 'path';
 import * as vscode from 'vscode';
 import { window } from 'vscode';
 import { Config } from './config';
-import { FILE_NAME_TEMPLATE, PROMPT_FOR_REMOVAL } from './consts';
-import { FiletypesManager } from './filetypes.manager';
+import {
+  CONFIG_AUTO_FORMAT,
+  CONFIG_AUTO_PASTE,
+  CONFIG_PROMPT_FOR_FILENAME,
+  CONFIG_PROMPT_FOR_REMOVAL,
+  FILE_NAME_TEMPLATE,
+} from './consts';
+import { Filetype, FiletypesManager } from './filetypes.manager';
 import Utils from './utils';
 
 export class ScratchpadsManager {
@@ -18,31 +24,48 @@ export class ScratchpadsManager {
    * Create a new scratchpad file
    * If file name exists increment counter until a new file can be created
    */
-  public async createScratchpad() {
-    const filetype = await this.filetypeManager.selectFiletype();
+  public async createScratchpad(filetype?: Filetype) {
+    if (!filetype) {
+      filetype = await this.filetypeManager.selectFiletype();
+    }
 
     if (filetype) {
       let i = 0;
+      let baseFilename = FILE_NAME_TEMPLATE;
+      const isPromptForFilename = Config.getExtensionConfiguration(CONFIG_PROMPT_FOR_FILENAME);
 
-      let fileNameFromUser = await window.showInputBox({ placeHolder: 'Enter a filename:' });
-      if (!fileNameFromUser) {
-        fileNameFromUser = FILE_NAME_TEMPLATE;
+      if (isPromptForFilename) {
+        const filenameFromUser = await window.showInputBox({
+          placeHolder: 'Enter a filename:',
+        });
+
+        if (filenameFromUser) {
+          baseFilename = filenameFromUser;
+        }
       }
 
-      let filename = `${fileNameFromUser}${filetype.ext}`;
-      let fullPath = path.join(Config.projectScratchpadsPath, filename);
+      let finalFilename = `${baseFilename}${filetype.ext}`;
+      let fullPath = path.join(Config.projectScratchpadsPath, finalFilename);
 
       // Find an available filename
       while (fs.existsSync(fullPath)) {
         i = i + 1;
-        filename = `${fileNameFromUser}${i}${filetype.ext}`;
-        fullPath = path.join(Config.projectScratchpadsPath, filename);
+        finalFilename = `${baseFilename}${i}${filetype.ext}`;
+        fullPath = path.join(Config.projectScratchpadsPath, finalFilename);
       }
 
-      fs.writeFileSync(fullPath, '');
+      const isAutoPaste = Config.getExtensionConfiguration(CONFIG_AUTO_PASTE);
+      const isAutoFormat = Config.getExtensionConfiguration(CONFIG_AUTO_FORMAT);
+      const data = isAutoPaste ? await vscode.env.clipboard.readText() : '';
+
+      fs.writeFileSync(fullPath, data);
 
       const doc = await vscode.workspace.openTextDocument(fullPath);
       window.showTextDocument(doc);
+
+      if (isAutoPaste && isAutoFormat) {
+        await this.autoFormatDoc(doc);
+      }
     }
   }
 
@@ -50,7 +73,7 @@ export class ScratchpadsManager {
    * Re-open a scratchpad file
    */
   public async openScratchpad() {
-    let files = fs.readdirSync(Config.projectScratchpadsPath);
+    const files = fs.readdirSync(Config.projectScratchpadsPath);
 
     if (!files.length) {
       window.showInformationMessage('No scratchpads to open');
@@ -62,7 +85,7 @@ export class ScratchpadsManager {
       return;
     }
 
-    let filePath = path.join(Config.projectScratchpadsPath, selection);
+    const filePath = path.join(Config.projectScratchpadsPath, selection);
 
     if (fs.existsSync(filePath)) {
       const doc = await vscode.workspace.openTextDocument(filePath);
@@ -74,7 +97,7 @@ export class ScratchpadsManager {
    * Remove a single scratchpad file
    */
   public async removeScratchpad() {
-    let files = fs.readdirSync(Config.projectScratchpadsPath);
+    const files = fs.readdirSync(Config.projectScratchpadsPath);
 
     if (!files.length) {
       window.showInformationMessage('No scratchpads to delete');
@@ -86,7 +109,7 @@ export class ScratchpadsManager {
       return;
     }
 
-    let filePath = path.join(Config.projectScratchpadsPath, selection);
+    const filePath = path.join(Config.projectScratchpadsPath, selection);
     fs.unlinkSync(filePath);
 
     window.showInformationMessage(`Removed ${selection}`);
@@ -103,10 +126,40 @@ export class ScratchpadsManager {
   }
 
   /**
-   * Prompt the user for confirmation before removing scratchpads
+   * Add a new Filetype
+   */
+  public async newFiletype() {
+    const newFileType = await this.filetypeManager.newFiletype();
+    newFileType && (await this.createScratchpad(newFileType));
+  }
+
+  /**
+   * Automatically format the text inside the given document
+   * @param doc the document to format
+   */
+  private async autoFormatDoc(doc: vscode.TextDocument) {
+    const docUri = doc.uri;
+    const edit = new vscode.WorkspaceEdit();
+    const textEdits = (await vscode.commands.executeCommand(
+      'vscode.executeFormatDocumentProvider',
+      docUri,
+    )) as vscode.TextEdit[];
+
+    if (textEdits) {
+      for (const textEdit of textEdits) {
+        edit.replace(docUri, textEdit.range, textEdit.newText);
+      }
+
+      await vscode.workspace.applyEdit(edit);
+    }
+  }
+
+  /**
+   * Check if we should prompt the user for confirmation before removing scratchpads.
+   * If the user previously clicked on "Always" no need to prompt, and we can go ahead and remote them.
    */
   private async confirmRemoval() {
-    const isPromptForRemoval = Config.extensionConfig.inspect(PROMPT_FOR_REMOVAL)?.globalValue;
+    const isPromptForRemoval = Config.getExtensionConfiguration(CONFIG_PROMPT_FOR_REMOVAL);
 
     if (isPromptForRemoval === undefined || isPromptForRemoval) {
       const answer = await window.showWarningMessage(
@@ -121,7 +174,7 @@ export class ScratchpadsManager {
       }
 
       if (answer === 'Always') {
-        Config.extensionConfig.update(PROMPT_FOR_REMOVAL, false, true);
+        Config.setExtensionConfiguration(CONFIG_PROMPT_FOR_REMOVAL, false);
       }
     }
 
@@ -186,7 +239,7 @@ export class ScratchpadsManager {
   private deleteScratchpadFiles() {
     console.log('Deleting scratchpad files');
 
-    let files = fs.readdirSync(Config.projectScratchpadsPath);
+    const files = fs.readdirSync(Config.projectScratchpadsPath);
 
     for (let i = 0, len = files.length; i < len; i++) {
       fs.unlinkSync(path.join(Config.projectScratchpadsPath, files[i]));

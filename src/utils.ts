@@ -1,13 +1,21 @@
-import { commands } from 'vscode';
 import * as fs from 'fs';
+import * as path from 'path';
+import { commands, window } from 'vscode';
 import { Config } from './config';
 import { ACTIONS_TIMEOUT } from './consts';
 
 export default class Utils {
-  public static createFolders() {
+  public static confirmFolder(): boolean {
     if (!fs.existsSync(Config.projectScratchpadsPath)) {
-      fs.mkdirSync(Config.projectScratchpadsPath, { recursive: true });
+      if (Utils.validateFolderCreatable(Config.projectScratchpadsPath)) {
+        fs.mkdirSync(Config.projectScratchpadsPath, { recursive: true });
+      } else {
+        window.showInformationMessage(`Invalid scratchpads path given (${Config.customPath}). Check configuration...`);
+        return false;
+      }
     }
+
+    return true;
   }
 
   /**
@@ -32,5 +40,17 @@ export default class Utils {
    */
   public static sleep(ms: number) {
     return new Promise((f) => setTimeout(f, ms));
+  }
+
+  public static validateFolderCreatable(p: string) {
+    const nodes = p.split(path.sep);
+
+    for (let i = nodes.length; i > 0; i--) {
+      if (fs.existsSync(nodes.slice(0, i).join(path.sep))) {
+        return true;
+      }
+    }
+
+    return false;
   }
 }

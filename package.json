@@ -25,18 +25,38 @@
     "onCommand:scratchpads.newScratchpad",
     "onCommand:scratchpads.removeScratchpad",
     "onCommand:scratchpads.removeAllScratchpads",
-    "onCommand:scratchpads.openScratchpad"
+    "onCommand:scratchpads.openScratchpad",
+    "onCommand:scratchpads.newFiletype"
   ],
   "main": "./dist/extension.js",
   "contributes": {
     "configuration": {
       "type": "object",
-      "title": "Scratchpads configuration",
+      "title": "Scratchpads",
       "properties": {
+        "scratchpads.scratchpadsFolder": {
+          "type": "string",
+          "description": "A custom full path in which the scratchpads will be stored (Note: Data will not be moved)."
+        },
         "scratchpads.promptForRemoval": {
           "type": "boolean",
           "default": true,
-          "description": "Prompt the user when removing scratchpads"
+          "description": "Prompt the user when removing all scratchpads"
+        },
+        "scratchpads.promptForFilename": {
+          "type": "boolean",
+          "default": false,
+          "description": "Prompt the user for a file name when creating a new scratchpad"
+        },
+        "scratchpads.autoPaste": {
+          "type": "boolean",
+          "default": true,
+          "description": "Automatically paste clipboard content into the new scratchpad"
+        },
+        "scratchpads.autoFormat": {
+          "type": "boolean",
+          "default": true,
+          "description": "Automatically format the new scratchpad content (works only if auto paste is on)"
         }
       }
     },
@@ -56,6 +76,10 @@
       {
         "command": "scratchpads.openScratchpad",
         "title": "Scratchpads: Open scratchpad"
+      },
+      {
+        "command": "scratchpads.newFiletype",
+        "title": "Scratchpads: New filetype"
       }
     ]
   },
