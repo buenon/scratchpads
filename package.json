@@ -1,76 +1,120 @@
 {
-    "name": "scratchpads",
-    "displayName": "Scratchpads",
-    "description": "Create multiple scratchpad files of different file types",
-    "version": "0.0.8",
-    "publisher": "buenon",
-    "author": {
-        "name": "Nadav Bueno",
-        "email": "buenonadav@gmail.com"
-    },
-    "license": "MIT",
-    "homepage": "https://github.com/buenon/scratchpads/blob/master/README.md",
-    "repository": {
-        "type": "git",
-        "url": "https://github.com/buenon/scratchpads"
-    },
-    "icon": "images/icon.png",
-    "engines": {
-        "vscode": "^1.31.0"
-    },
-    "categories": [
-        "Other"
-    ],
-    "activationEvents": [
-        "onCommand:scratchpads.newScratchpad",
-        "onCommand:scratchpads.removeScratchpad",
-        "onCommand:scratchpads.removeAllScratchpads",
-        "onCommand:scratchpads.openScratchpad"
-    ],
-    "main": "./src/extension",
-    "contributes": {
-        "configuration": {
-            "type": "object",
-            "title": "Scratchpads configuration",
-            "properties": {
-                "scratchpads.promptForRemoval": {
-                    "type": "boolean",
-                    "default": true,
-                    "description": "Prompt the user when removing scratchpads"
-                }
-            }
+  "name": "scratchpads",
+  "displayName": "Scratchpads",
+  "description": "Create multiple scratchpad files of different file types",
+  "version": "1.0.0",
+  "publisher": "buenon",
+  "author": {
+    "name": "Nadav Bueno",
+    "email": "buenonadav@gmail.com"
+  },
+  "license": "MIT",
+  "homepage": "https://github.com/buenon/scratchpads/blob/master/README.md",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/buenon/scratchpads"
+  },
+  "icon": "images/icon.png",
+  "engines": {
+    "vscode": "^1.70.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "activationEvents": [
+    "onCommand:scratchpads.newScratchpad",
+    "onCommand:scratchpads.removeScratchpad",
+    "onCommand:scratchpads.removeAllScratchpads",
+    "onCommand:scratchpads.openScratchpad",
+    "onCommand:scratchpads.newFiletype"
+  ],
+  "main": "./dist/extension.js",
+  "contributes": {
+    "configuration": {
+      "type": "object",
+      "title": "Scratchpads",
+      "properties": {
+        "scratchpads.scratchpadsFolder": {
+          "type": "string",
+          "description": "A custom full path in which the scratchpads will be stored (Note: Data will not be moved)."
         },
-        "commands": [
-            {
-                "command": "scratchpads.newScratchpad",
-                "title": "Scratchpads: New scratchpad"
-            },
-            {
-                "command": "scratchpads.removeScratchpad",
-                "title": "Scratchpads: Remove a scratchpad"
-            },
-            {
-                "command": "scratchpads.removeAllScratchpads",
-                "title": "Scratchpads: Remove all scratchpads"
-            },
-            {
-                "command": "scratchpads.openScratchpad",
-                "title": "Scratchpads: Open scratchpad"
-            }
-        ]
+        "scratchpads.promptForRemoval": {
+          "type": "boolean",
+          "default": true,
+          "description": "Prompt the user when removing all scratchpads"
+        },
+        "scratchpads.promptForFilename": {
+          "type": "boolean",
+          "default": false,
+          "description": "Prompt the user for a file name when creating a new scratchpad"
+        },
+        "scratchpads.autoPaste": {
+          "type": "boolean",
+          "default": true,
+          "description": "Automatically paste clipboard content into the new scratchpad"
+        },
+        "scratchpads.autoFormat": {
+          "type": "boolean",
+          "default": true,
+          "description": "Automatically format the new scratchpad content (works only if auto paste is on)"
+        }
+      }
     },
-    "scripts": {
-        "postinstall": "node ./node_modules/vscode/bin/install",
-        "test": "node ./node_modules/vscode/bin/test"
-    },
-    "devDependencies": {
-        "@types/mocha": "^2.2.42",
-        "@types/node": "^7.10.3",
-        "eslint": "^5.14.1",
-        "typescript": "^2.9.2",
-        "vscode": "^1.1.29"
-    },
-    "dependencies": {
-        "md5": "^2.2.1"
-    }
+    "commands": [
+      {
+        "command": "scratchpads.newScratchpad",
+        "title": "Scratchpads: New scratchpad"
+      },
+      {
+        "command": "scratchpads.removeScratchpad",
+        "title": "Scratchpads: Remove a scratchpad"
+      },
+      {
+        "command": "scratchpads.removeAllScratchpads",
+        "title": "Scratchpads: Remove all scratchpads"
+      },
+      {
+        "command": "scratchpads.openScratchpad",
+        "title": "Scratchpads: Open scratchpad"
+      },
+      {
+        "command": "scratchpads.newFiletype",
+        "title": "Scratchpads: New filetype"
+      }
+    ]
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run package",
+    "compile": "webpack",
+    "watch": "webpack --watch",
+    "package": "webpack --mode production --devtool hidden-source-map",
+    "compile-tests": "tsc -p . --outDir out",
+    "watch-tests": "tsc -p . -w --outDir out",
+    "pretest": "npm run compile-tests && npm run compile && npm run lint",
+    "lint": "eslint src --ext ts",
+    "test": "node ./out/test/runTest.js"
+  },
+  "dependencies": {
+    "language-map": "^1.5.0",
+    "ts-md5": "^1.3.1"
+  },
+  "devDependencies": {
+    "@types/glob": "^7.2.0",
+    "@types/mocha": "^9.1.1",
+    "@types/node": "16.x",
+    "@types/vscode": "^1.70.0",
+    "@typescript-eslint/eslint-plugin": "^5.31.0",
+    "@typescript-eslint/parser": "^5.31.0",
+    "@vscode/test-electron": "^2.1.5",
+    "eslint": "^8.20.0",
+    "eslint-config-prettier": "^8.5.0",
+    "eslint-plugin-prettier": "^4.2.1",
+    "glob": "^8.0.3",
+    "mocha": "^10.0.0",
+    "prettier": "^2.7.1",
+    "ts-loader": "^9.3.1",
+    "typescript": "^4.7.4",
+    "webpack": "^5.74.0",
+    "webpack-cli": "^4.10.0"
+  }
 }
