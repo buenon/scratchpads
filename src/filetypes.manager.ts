@@ -13,18 +13,13 @@ export interface FiletypeQuickPickItem extends vscode.QuickPickItem {
 }
 
 export class FiletypesManager {
-  private recentFiletypes: Filetype[];
-  private mainFiletypes: Filetype[];
-  private additionalFiletypes: Filetype[];
-  private filetypeItems: FiletypeQuickPickItem[];
+  private recentFiletypes: Filetype[] = [];
+  private mainFiletypes: Filetype[] = [];
+  private additionalFiletypes: Filetype[] = [];
+  private filetypeItems: FiletypeQuickPickItem[] = [];
   private isFiletypeItemsDirty: boolean = false;
 
   constructor() {
-    this.recentFiletypes = [];
-    this.mainFiletypes = [];
-    this.additionalFiletypes = [];
-    this.filetypeItems = [];
-
     this.loadFiletypes();
     this.prepareItems();
   }
@@ -112,8 +107,8 @@ export class FiletypesManager {
     // Remove duplicate extensions from additionalFiletypes
     this.additionalFiletypes = this.additionalFiletypes.reduce((newArray: Filetype[], currentType) => {
       const found =
-        this.mainFiletypes.find((type) => type.ext === currentType.ext) ||
-        newArray.find((type) => type.ext === currentType.ext);
+          this.mainFiletypes.find((type) => type.ext === currentType.ext) ||
+          newArray.find((type) => type.ext === currentType.ext);
 
       if (!found) {
         newArray.push(currentType);
@@ -137,7 +132,7 @@ export class FiletypesManager {
   }
 
   /**
-   * Make sure the file type items are up to date and ordered correctly
+   * Make sure the file type items are up-to-date and ordered correctly
    */
   private prepareItems() {
     if (!this.filetypeItems.length || this.isFiletypeItemsDirty) {
@@ -164,7 +159,8 @@ export class FiletypesManager {
 
   /**
    * Add the given file type to the recent array
-   * @param {object} typeToAdd
+   * New filetypes are also added to this array making it a hybrid DB for custom and recent filetypes
+   * @param {object} typeToAdd The filetype to add
    */
   private addTypeToRecentFiletypes(typeToAdd: Filetype) {
     if (!this.recentFiletypes.length || this.recentFiletypes[0].ext !== typeToAdd.ext) {
@@ -191,7 +187,7 @@ export class FiletypesManager {
     });
 
     for (const type of typesToAdd) {
-      this.filetypeItems.push({ label: `${type.name} (${type.ext})`, type });
+      this.filetypeItems.push({label: `${type.name} (${type.ext})`, type});
     }
   }
 
