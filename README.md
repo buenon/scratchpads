@@ -19,6 +19,7 @@ Create multiple scratchpad files for doodling while you're coding.
 * `Scratchpads: New scratchpad`
 * `Scratchpads: Open scratchpad`
 * `Scratchpads: Rename scratchpad`
+* `Scratchpads: Open latest scratchpad`
 * `Scratchpads: New filetype`
 * `Scratchpads: Remove scratchpad`
 * `Scratchpads: Remove all scratchpads`  

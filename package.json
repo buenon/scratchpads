@@ -68,6 +68,10 @@
         "title": "Scratchpads: Open scratchpad"
       },
       {
+        "command": "scratchpads.openLatestScratchpad",
+        "title": "Scratchpads: Open latest scratchpad"
+      },
+      {
         "command": "scratchpads.renameScratchpad",
         "title": "Scratchpads: Rename scratchpad"
       },
