@@ -18,6 +18,7 @@ Create multiple scratchpad files for doodling while you're coding.
 
 * `Scratchpads: New scratchpad`
 * `Scratchpads: Open scratchpad`
+* `Scratchpads: Rename scratchpad`
 * `Scratchpads: New filetype`
 * `Scratchpads: Remove scratchpad`
 * `Scratchpads: Remove all scratchpads`  
@@ -38,6 +39,7 @@ Available extension configuration:
 * `Prompt For Filename` - Prompt the user for a file name when creating a new scratchpad
 * `Prompt For Removal` - Prompt the user when removing all scratchpads
 * `Scratchpads Folder` - A custom full path in which the scratchpads will be stored (Note: Data will not be moved).
+* `Rename With Extension` - Include the file extension when renaming a scratchpad
 
 ## Source
 

@@ -21,13 +21,6 @@
   "categories": [
     "Other"
   ],
-  "activationEvents": [
-    "onCommand:scratchpads.newScratchpad",
-    "onCommand:scratchpads.removeScratchpad",
-    "onCommand:scratchpads.removeAllScratchpads",
-    "onCommand:scratchpads.openScratchpad",
-    "onCommand:scratchpads.newFiletype"
-  ],
   "main": "./dist/extension.js",
   "contributes": {
     "configuration": {
@@ -57,6 +50,11 @@
           "type": "boolean",
           "default": true,
           "description": "Automatically format the new scratchpad content (works only if auto paste is on)"
+        },
+        "scratchpads.renameWithExtension": {
+          "type": "boolean",
+          "default": false,
+          "description": "Include the file extension when renaming a scratchpad"
         }
       }
     },
@@ -66,16 +64,20 @@
         "title": "Scratchpads: New scratchpad"
       },
       {
+        "command": "scratchpads.openScratchpad",
+        "title": "Scratchpads: Open scratchpad"
+      },
+      {
+        "command": "scratchpads.renameScratchpad",
+        "title": "Scratchpads: Rename scratchpad"
+      },
+      {
         "command": "scratchpads.removeScratchpad",
         "title": "Scratchpads: Remove a scratchpad"
       },
       {
         "command": "scratchpads.removeAllScratchpads",
         "title": "Scratchpads: Remove all scratchpads"
-      },
-      {
-        "command": "scratchpads.openScratchpad",
-        "title": "Scratchpads: Open scratchpad"
       },
       {
         "command": "scratchpads.newFiletype",
