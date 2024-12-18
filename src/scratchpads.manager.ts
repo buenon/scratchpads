@@ -94,6 +94,41 @@ export class ScratchpadsManager {
     }
   }
 
+  
+  /**
+   * Open the most recently created/modified scratchpad file
+   */
+  public async openLatestScratchpad() {
+    const files = fs.readdirSync(Config.projectScratchpadsPath);
+
+    if (!files.length) {
+      window.showInformationMessage('No scratchpads to open');
+      return;
+    }
+
+    try {
+      // Get all files with their stats
+      const fileStats = files.map(file => {
+        const filePath = path.join(Config.projectScratchpadsPath, file);
+        return {
+          name: file,
+          path: filePath,
+          mtime: fs.statSync(filePath).mtime
+        };
+      });
+
+      // Sort by modification time, most recent first
+      fileStats.sort((a, b) => b.mtime.getTime() - a.mtime.getTime());
+
+      // Open the most recent file
+      const latestFile = fileStats[0];
+      const doc = await vscode.workspace.openTextDocument(latestFile.path);
+      await vscode.window.showTextDocument(doc, vscode.ViewColumn.One, false);
+    } catch (error) {
+      window.showErrorMessage(`Failed to open latest scratchpad: ${error}`);
+    }
+  }
+
   /**
    * Rename the current scratchpad file
    */
