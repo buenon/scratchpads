@@ -9,6 +9,7 @@ import {
   CONFIG_PROMPT_FOR_FILENAME,
   CONFIG_PROMPT_FOR_REMOVAL,
   FILE_NAME_TEMPLATE,
+  CONFIG_RENAME_WITH_EXTENSION,
 } from './consts';
 import { Filetype, FiletypesManager } from './filetypes.manager';
 import Utils from './utils';
@@ -90,6 +91,64 @@ export class ScratchpadsManager {
     if (fs.existsSync(filePath)) {
       const doc = await vscode.workspace.openTextDocument(filePath);
       vscode.window.showTextDocument(doc, vscode.ViewColumn.One, false);
+    }
+  }
+
+  /**
+   * Rename the current scratchpad file
+   */
+  public async renameScratchpad() {
+    const activeEditor = window.activeTextEditor;
+    
+    if (!activeEditor || !this.isScratchpadEditor(activeEditor)) {
+      window.showInformationMessage('Please open a scratchpad file first');
+      return;
+    }
+
+    const currentFilePath = activeEditor.document.fileName;
+    const currentFileName = path.basename(currentFilePath);
+    const currentFileExt = path.extname(currentFileName);
+    const currentBaseName = path.basename(currentFileName, currentFileExt);
+    const renameWithExt = Config.getExtensionConfiguration(CONFIG_RENAME_WITH_EXTENSION);
+
+    const inputValue = renameWithExt ? currentFileName : currentBaseName;
+
+    const newFileName = await window.showInputBox({
+      placeHolder: 'Enter new filename:',
+      value: inputValue,
+    });
+
+    if (!newFileName) {
+      return;
+    }
+
+    // Determine the final path based on whether extension renaming is allowed
+    const finalFileName = renameWithExt ? 
+      newFileName : 
+      `${newFileName}${currentFileExt}`;
+    
+    const newFilePath = path.join(Config.projectScratchpadsPath, finalFileName);
+
+    // Check if target file already exists
+    if (fs.existsSync(newFilePath)) {
+      window.showErrorMessage('A file with that name already exists');
+      return;
+    }
+
+    try {
+      // Close the document first to avoid file lock issues
+      await activeEditor.document.save();
+      await Utils.closeActiveEditor();
+
+      fs.renameSync(currentFilePath, newFilePath);
+      
+      // Reopen the renamed file
+      const doc = await vscode.workspace.openTextDocument(newFilePath);
+      window.showTextDocument(doc);
+
+      window.showInformationMessage(`Renamed to ${finalFileName}`);
+    } catch (error) {
+      window.showErrorMessage(`Failed to rename file: ${error}`);
     }
   }
 

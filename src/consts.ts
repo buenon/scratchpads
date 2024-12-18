@@ -9,3 +9,4 @@ export const CONFIG_PROMPT_FOR_REMOVAL = 'promptForRemoval';
 export const CONFIG_PROMPT_FOR_FILENAME = 'promptForFilename';
 export const CONFIG_AUTO_PASTE = 'autoPaste';
 export const CONFIG_AUTO_FORMAT = 'autoFormat';
+export const CONFIG_RENAME_WITH_EXTENSION = 'renameWithExtension';
