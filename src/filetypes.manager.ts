@@ -107,8 +107,8 @@ export class FiletypesManager {
     // Remove duplicate extensions from additionalFiletypes
     this.additionalFiletypes = this.additionalFiletypes.reduce((newArray: Filetype[], currentType) => {
       const found =
-          this.mainFiletypes.find((type) => type.ext === currentType.ext) ||
-          newArray.find((type) => type.ext === currentType.ext);
+        this.mainFiletypes.find((type) => type.ext === currentType.ext) ||
+        newArray.find((type) => type.ext === currentType.ext);
 
       if (!found) {
         newArray.push(currentType);
@@ -187,7 +187,7 @@ export class FiletypesManager {
     });
 
     for (const type of typesToAdd) {
-      this.filetypeItems.push({label: `${type.name} (${type.ext})`, type});
+      this.filetypeItems.push({ label: `${type.name} (${type.ext})`, type });
     }
   }
 

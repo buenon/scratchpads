@@ -55,6 +55,11 @@
           "type": "boolean",
           "default": false,
           "description": "Include the file extension when renaming a scratchpad"
+        },
+        "scratchpads.filePrefix": {
+          "type": "string",
+          "default": "scratch",
+          "description": "The prefix to use when creating new scratchpad files"
         }
       }
     },
