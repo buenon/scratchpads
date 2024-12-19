@@ -2,6 +2,7 @@ import * as fs from 'fs';
 import * as vscode from 'vscode';
 import { window } from 'vscode';
 import { Config } from './config';
+import { CONFIG_DEFAULT_FILETYPE } from './consts';
 
 export interface Filetype {
   name: string;
@@ -27,10 +28,12 @@ export class FiletypesManager {
   /**
    * Select the type of the scratchpad file
    */
-  public async selectFiletype(): Promise<Filetype | undefined> {
+  public async selectFiletype(placeHolder?: string): Promise<Filetype | undefined> {
     this.prepareItems();
 
-    const selection = await window.showQuickPick(this.filetypeItems);
+    const selection = await window.showQuickPick(this.filetypeItems, {
+      placeHolder: placeHolder || 'Select filetype',
+    });
 
     if (!selection?.type) {
       return;
@@ -223,5 +226,19 @@ export class FiletypesManager {
    */
   private normalizeExtension(ext: string): string {
     return ext.replace('.', '').toLowerCase();
+  }
+
+  /**
+   * Get filetype by extension
+   * @param ext The file extension (with or without dot)
+   */
+  public getDefaultFiletype(): Filetype | undefined {
+    const defaultExt = Config.getExtensionConfiguration(CONFIG_DEFAULT_FILETYPE) as string;
+    
+    if (!defaultExt) {
+      return undefined;
+    }
+
+    return this.getFileType(defaultExt);
   }
 }

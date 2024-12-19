@@ -60,6 +60,11 @@
           "type": "string",
           "default": "scratch",
           "description": "The prefix to use when creating new scratchpad files"
+        },
+        "scratchpads.defaultFiletype": {
+          "type": "string",
+          "default": "",
+          "description": "The default file extension to use with 'New scratchpad (default)' command (e.g., 'js', 'ts', 'py')"
         }
       }
     },
@@ -67,6 +72,10 @@
       {
         "command": "scratchpads.newScratchpad",
         "title": "Scratchpads: New scratchpad"
+      },
+      {
+        "command": "scratchpads.newScratchpadDefault",
+        "title": "Scratchpads: New scratchpad (default)"
       },
       {
         "command": "scratchpads.openScratchpad",
