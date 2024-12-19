@@ -6,6 +6,7 @@ import { Config } from './config';
 import {
   CONFIG_AUTO_FORMAT,
   CONFIG_AUTO_PASTE,
+  CONFIG_DEFAULT_FILETYPE,
   CONFIG_FILE_PREFIX,
   CONFIG_PROMPT_FOR_FILENAME,
   CONFIG_PROMPT_FOR_REMOVAL,
@@ -69,6 +70,30 @@ export class ScratchpadsManager {
       if (isAutoPaste && isAutoFormat) {
         await this.autoFormatDoc(doc);
       }
+    }
+  }
+
+  /**
+   * Create a new scratchpad with default filetype
+   */
+  public async createScratchpadDefault() {
+    let defaultType = this.filetypeManager.getDefaultFiletype();
+    
+    if (!defaultType) {
+      defaultType = await this.filetypeManager.selectFiletype('Select default filetype');
+      if (defaultType) {
+        // Save the selected type as default (without the dot)
+        const defaultExt = defaultType.ext.replace('.', '');
+        await Config.extensionConfig.update(
+          CONFIG_DEFAULT_FILETYPE,
+          defaultExt,
+          vscode.ConfigurationTarget.Global
+        );
+      }
+    }
+    
+    if (defaultType) {
+      await this.createScratchpad(defaultType);
     }
   }
 
