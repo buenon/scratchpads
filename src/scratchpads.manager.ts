@@ -6,10 +6,11 @@ import { Config } from './config';
 import {
   CONFIG_AUTO_FORMAT,
   CONFIG_AUTO_PASTE,
+  CONFIG_FILE_PREFIX,
   CONFIG_PROMPT_FOR_FILENAME,
   CONFIG_PROMPT_FOR_REMOVAL,
-  FILE_NAME_TEMPLATE,
   CONFIG_RENAME_WITH_EXTENSION,
+  DEFAULT_FILE_PREFIX,
 } from './consts';
 import { Filetype, FiletypesManager } from './filetypes.manager';
 import Utils from './utils';
@@ -32,7 +33,8 @@ export class ScratchpadsManager {
 
     if (filetype) {
       let i = 0;
-      let baseFilename = FILE_NAME_TEMPLATE;
+      const configPrefix = Config.getExtensionConfiguration(CONFIG_FILE_PREFIX) as string;
+      let baseFilename = configPrefix || DEFAULT_FILE_PREFIX;
       const isPromptForFilename = Config.getExtensionConfiguration(CONFIG_PROMPT_FOR_FILENAME);
 
       if (isPromptForFilename) {
@@ -94,7 +96,6 @@ export class ScratchpadsManager {
     }
   }
 
-  
   /**
    * Open the most recently created/modified scratchpad file
    */
@@ -108,12 +109,12 @@ export class ScratchpadsManager {
 
     try {
       // Get all files with their stats
-      const fileStats = files.map(file => {
+      const fileStats = files.map((file) => {
         const filePath = path.join(Config.projectScratchpadsPath, file);
         return {
           name: file,
           path: filePath,
-          mtime: fs.statSync(filePath).mtime
+          mtime: fs.statSync(filePath).mtime,
         };
       });
 
@@ -134,7 +135,7 @@ export class ScratchpadsManager {
    */
   public async renameScratchpad() {
     const activeEditor = window.activeTextEditor;
-    
+
     if (!activeEditor || !this.isScratchpadEditor(activeEditor)) {
       window.showInformationMessage('Please open a scratchpad file first');
       return;
@@ -158,10 +159,8 @@ export class ScratchpadsManager {
     }
 
     // Determine the final path based on whether extension renaming is allowed
-    const finalFileName = renameWithExt ? 
-      newFileName : 
-      `${newFileName}${currentFileExt}`;
-    
+    const finalFileName = renameWithExt ? newFileName : `${newFileName}${currentFileExt}`;
+
     const newFilePath = path.join(Config.projectScratchpadsPath, finalFileName);
 
     // Check if target file already exists
@@ -176,7 +175,7 @@ export class ScratchpadsManager {
       await Utils.closeActiveEditor();
 
       fs.renameSync(currentFilePath, newFilePath);
-      
+
       // Reopen the renamed file
       const doc = await vscode.workspace.openTextDocument(newFilePath);
       window.showTextDocument(doc);
