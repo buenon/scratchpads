@@ -54,3 +54,10 @@
     - Specify a custom scratchpads folder (*When changing folders the data will not be moved automatically*)
 - Prompt for filename when creating a new scratchpad is now optional (default off)
 
+## 1.0.1
+
+- [#3](https://github.com/buenon/scratchpads/issues/3) - Added command to open latest scratchpad
+- [#37](https://github.com/buenon/scratchpads/issues/37) - Added ability to rename scratchpads
+- [#41](https://github.com/buenon/scratchpads/issues/41) - Added default filetype configuration
+- [#42](https://github.com/buenon/scratchpads/issues/42) - Added scratchpad prefix configuration
+
