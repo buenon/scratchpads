@@ -6,9 +6,12 @@ import { Config } from './config';
 import {
   CONFIG_AUTO_FORMAT,
   CONFIG_AUTO_PASTE,
+  CONFIG_DEFAULT_FILETYPE,
+  CONFIG_FILE_PREFIX,
   CONFIG_PROMPT_FOR_FILENAME,
   CONFIG_PROMPT_FOR_REMOVAL,
-  FILE_NAME_TEMPLATE,
+  CONFIG_RENAME_WITH_EXTENSION,
+  DEFAULT_FILE_PREFIX,
 } from './consts';
 import { Filetype, FiletypesManager } from './filetypes.manager';
 import Utils from './utils';
@@ -31,7 +34,8 @@ export class ScratchpadsManager {
 
     if (filetype) {
       let i = 0;
-      let baseFilename = FILE_NAME_TEMPLATE;
+      const configPrefix = Config.getExtensionConfiguration(CONFIG_FILE_PREFIX) as string;
+      let baseFilename = configPrefix || DEFAULT_FILE_PREFIX;
       const isPromptForFilename = Config.getExtensionConfiguration(CONFIG_PROMPT_FOR_FILENAME);
 
       if (isPromptForFilename) {
@@ -70,6 +74,30 @@ export class ScratchpadsManager {
   }
 
   /**
+   * Create a new scratchpad with default filetype
+   */
+  public async createScratchpadDefault() {
+    let defaultType = this.filetypeManager.getDefaultFiletype();
+    
+    if (!defaultType) {
+      defaultType = await this.filetypeManager.selectFiletype('Select default filetype');
+      if (defaultType) {
+        // Save the selected type as default (without the dot)
+        const defaultExt = defaultType.ext.replace('.', '');
+        await Config.extensionConfig.update(
+          CONFIG_DEFAULT_FILETYPE,
+          defaultExt,
+          vscode.ConfigurationTarget.Global
+        );
+      }
+    }
+    
+    if (defaultType) {
+      await this.createScratchpad(defaultType);
+    }
+  }
+
+  /**
    * Re-open a scratchpad file
    */
   public async openScratchpad() {
@@ -90,6 +118,96 @@ export class ScratchpadsManager {
     if (fs.existsSync(filePath)) {
       const doc = await vscode.workspace.openTextDocument(filePath);
       vscode.window.showTextDocument(doc, vscode.ViewColumn.One, false);
+    }
+  }
+
+  /**
+   * Open the most recently created/modified scratchpad file
+   */
+  public async openLatestScratchpad() {
+    const files = fs.readdirSync(Config.projectScratchpadsPath);
+
+    if (!files.length) {
+      window.showInformationMessage('No scratchpads to open');
+      return;
+    }
+
+    try {
+      // Get all files with their stats
+      const fileStats = files.map((file) => {
+        const filePath = path.join(Config.projectScratchpadsPath, file);
+        return {
+          name: file,
+          path: filePath,
+          mtime: fs.statSync(filePath).mtime,
+        };
+      });
+
+      // Sort by modification time, most recent first
+      fileStats.sort((a, b) => b.mtime.getTime() - a.mtime.getTime());
+
+      // Open the most recent file
+      const latestFile = fileStats[0];
+      const doc = await vscode.workspace.openTextDocument(latestFile.path);
+      await vscode.window.showTextDocument(doc, vscode.ViewColumn.One, false);
+    } catch (error) {
+      window.showErrorMessage(`Failed to open latest scratchpad: ${error}`);
+    }
+  }
+
+  /**
+   * Rename the current scratchpad file
+   */
+  public async renameScratchpad() {
+    const activeEditor = window.activeTextEditor;
+
+    if (!activeEditor || !this.isScratchpadEditor(activeEditor)) {
+      window.showInformationMessage('Please open a scratchpad file first');
+      return;
+    }
+
+    const currentFilePath = activeEditor.document.fileName;
+    const currentFileName = path.basename(currentFilePath);
+    const currentFileExt = path.extname(currentFileName);
+    const currentBaseName = path.basename(currentFileName, currentFileExt);
+    const renameWithExt = Config.getExtensionConfiguration(CONFIG_RENAME_WITH_EXTENSION);
+
+    const inputValue = renameWithExt ? currentFileName : currentBaseName;
+
+    const newFileName = await window.showInputBox({
+      placeHolder: 'Enter new filename:',
+      value: inputValue,
+    });
+
+    if (!newFileName) {
+      return;
+    }
+
+    // Determine the final path based on whether extension renaming is allowed
+    const finalFileName = renameWithExt ? newFileName : `${newFileName}${currentFileExt}`;
+
+    const newFilePath = path.join(Config.projectScratchpadsPath, finalFileName);
+
+    // Check if target file already exists
+    if (fs.existsSync(newFilePath)) {
+      window.showErrorMessage('A file with that name already exists');
+      return;
+    }
+
+    try {
+      // Close the document first to avoid file lock issues
+      await activeEditor.document.save();
+      await Utils.closeActiveEditor();
+
+      fs.renameSync(currentFilePath, newFilePath);
+
+      // Reopen the renamed file
+      const doc = await vscode.workspace.openTextDocument(newFilePath);
+      window.showTextDocument(doc);
+
+      window.showInformationMessage(`Renamed to ${finalFileName}`);
+    } catch (error) {
+      window.showErrorMessage(`Failed to rename file: ${error}`);
     }
   }
 

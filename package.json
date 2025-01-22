@@ -21,13 +21,6 @@
   "categories": [
     "Other"
   ],
-  "activationEvents": [
-    "onCommand:scratchpads.newScratchpad",
-    "onCommand:scratchpads.removeScratchpad",
-    "onCommand:scratchpads.removeAllScratchpads",
-    "onCommand:scratchpads.openScratchpad",
-    "onCommand:scratchpads.newFiletype"
-  ],
   "main": "./dist/extension.js",
   "contributes": {
     "configuration": {
@@ -57,6 +50,21 @@
           "type": "boolean",
           "default": true,
           "description": "Automatically format the new scratchpad content (works only if auto paste is on)"
+        },
+        "scratchpads.renameWithExtension": {
+          "type": "boolean",
+          "default": false,
+          "description": "Include the file extension when renaming a scratchpad"
+        },
+        "scratchpads.filePrefix": {
+          "type": "string",
+          "default": "scratch",
+          "description": "The prefix to use when creating new scratchpad files"
+        },
+        "scratchpads.defaultFiletype": {
+          "type": "string",
+          "default": "",
+          "description": "The default file extension to use with 'New scratchpad (default)' command (e.g., 'js', 'ts', 'py')"
         }
       }
     },
@@ -66,16 +74,28 @@
         "title": "Scratchpads: New scratchpad"
       },
       {
+        "command": "scratchpads.newScratchpadDefault",
+        "title": "Scratchpads: New scratchpad (default)"
+      },
+      {
+        "command": "scratchpads.openScratchpad",
+        "title": "Scratchpads: Open scratchpad"
+      },
+      {
+        "command": "scratchpads.openLatestScratchpad",
+        "title": "Scratchpads: Open latest scratchpad"
+      },
+      {
+        "command": "scratchpads.renameScratchpad",
+        "title": "Scratchpads: Rename scratchpad"
+      },
+      {
         "command": "scratchpads.removeScratchpad",
         "title": "Scratchpads: Remove a scratchpad"
       },
       {
         "command": "scratchpads.removeAllScratchpads",
         "title": "Scratchpads: Remove all scratchpads"
-      },
-      {
-        "command": "scratchpads.openScratchpad",
-        "title": "Scratchpads: Open scratchpad"
       },
       {
         "command": "scratchpads.newFiletype",
