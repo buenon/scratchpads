@@ -5,7 +5,7 @@ import { CONFIG_SCRATCHPADS_FOLDER, RECENT_FILETYPES_FILE, SCRATCHPADS_FOLDER_NA
 
 export class Config {
   public static context: vscode.ExtensionContext;
-  public static extensionConfig: vscode.WorkspaceConfiguration;
+  private static extensionConfig: vscode.WorkspaceConfiguration;
 
   public static globalPath: string;
   public static customPath: string;
@@ -14,6 +14,11 @@ export class Config {
   public static projectScratchpadsPath: string;
   public static recentFiletypesFilePath: string;
 
+  /**
+   * Initializes the configuration with the given extension context.
+   * Sets up global paths and loads extension configuration settings.
+   * @param context The VSCode extension context
+   */
   public static init(context: vscode.ExtensionContext) {
     this.context = context;
     this.extensionConfig = vscode.workspace.getConfiguration('scratchpads');
@@ -22,6 +27,11 @@ export class Config {
     this.recalculatePaths();
   }
 
+  /**
+   * Recalculates all path variables based on current configuration.
+   * This includes the custom path, scratchpads root path, and project-specific paths.
+   * Called when configuration changes or during initialization.
+   */
   public static recalculatePaths() {
     this.customPath = this.getExtensionConfiguration(CONFIG_SCRATCHPADS_FOLDER) as string;
 
@@ -31,21 +41,33 @@ export class Config {
   }
 
   /**
-   * Get the extension configuration (exposed in package.json) for the given key
-   * @param key
+   * Retrieves configuration values with proper fallback chain:
+   * workspace → global → default value
+   * @param key The configuration key to look up
+   * @returns The configuration value, or undefined if not found
    */
   public static getExtensionConfiguration(key: string) {
     const config = this.extensionConfig.inspect(key);
-    return config?.globalValue !== undefined ? config.globalValue : config?.defaultValue;
+    
+    if (config?.workspaceValue !== undefined) {
+      return config.workspaceValue;
+    }
+    
+    if (config?.globalValue !== undefined) {
+      return config.globalValue;
+    }
+    
+    return config?.defaultValue;
   }
 
   /**
    * Set an extension configuration based on the given key and value.
-   * The configuration will be saved on the global target.
-   * @param key
-   * @param value
+   * @param key Configuration key
+   * @param value Configuration value
+   * @param target Configuration target (defaults to Global)
+   * @returns Promise that resolves when the configuration is updated
    */
-  public static setExtensionConfiguration(key: string, value: any) {
-    this.extensionConfig.update(key, value, true);
+  public static async setExtensionConfiguration(key: string, value: any, target: vscode.ConfigurationTarget = vscode.ConfigurationTarget.Global): Promise<void> {
+    await this.extensionConfig.update(key, value, target);
   }
 }
