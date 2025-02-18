@@ -45,6 +45,8 @@ Available extension configuration:
 * `Scratchpads Folder` - A custom full path in which the scratchpads will be stored (Note: Data will not be moved)
 * `Rename With Extension` - Include the file extension when renaming a scratchpad
 
+> **Note**: Some extension features may automatically update these settings (e.g., setting default filetype, disabling removal prompt). These changes are saved to your global (user) settings, not workspace settings.
+
 ## Source
 
 [GitHub](https://github.com/buenon/scratchpads)
