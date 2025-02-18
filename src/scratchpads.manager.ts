@@ -104,7 +104,7 @@ export class ScratchpadsManager {
     const files = fs.readdirSync(Config.projectScratchpadsPath);
 
     if (!files.length) {
-      window.showInformationMessage('No scratchpads to open');
+      window.showInformationMessage('Scratchpads: No scratchpads to open');
       return;
     }
 
@@ -130,7 +130,7 @@ export class ScratchpadsManager {
     const files = fs.readdirSync(Config.projectScratchpadsPath);
 
     if (!files.length) {
-      window.showInformationMessage('No scratchpads to open');
+      window.showInformationMessage('Scratchpads: No scratchpads to open');
       return;
     }
 
@@ -153,7 +153,7 @@ export class ScratchpadsManager {
       const doc = await vscode.workspace.openTextDocument(latestFile.path);
       await vscode.window.showTextDocument(doc, vscode.ViewColumn.One, false);
     } catch (error) {
-      window.showErrorMessage(`Failed to open latest scratchpad: ${error}`);
+      window.showErrorMessage(`Scratchpads: Failed to open latest scratchpad: ${error}`);
     }
   }
 
@@ -164,7 +164,7 @@ export class ScratchpadsManager {
     const activeEditor = window.activeTextEditor;
 
     if (!activeEditor || !this.isScratchpadEditor(activeEditor)) {
-      window.showInformationMessage('Please open a scratchpad file first');
+      window.showInformationMessage('Scratchpads: Please open a scratchpad file first');
       return;
     }
 
@@ -192,7 +192,7 @@ export class ScratchpadsManager {
 
     // Check if target file already exists
     if (fs.existsSync(newFilePath)) {
-      window.showErrorMessage('A file with that name already exists');
+      window.showErrorMessage('Scratchpads: A file with that name already exists');
       return;
     }
 
@@ -207,9 +207,9 @@ export class ScratchpadsManager {
       const doc = await vscode.workspace.openTextDocument(newFilePath);
       window.showTextDocument(doc);
 
-      window.showInformationMessage(`Renamed to ${finalFileName}`);
+      window.showInformationMessage(`Scratchpads: Renamed to ${finalFileName}`);
     } catch (error) {
-      window.showErrorMessage(`Failed to rename file: ${error}`);
+      window.showErrorMessage(`Scratchpads: Failed to rename file: ${error}`);
     }
   }
 
@@ -220,7 +220,7 @@ export class ScratchpadsManager {
     const files = fs.readdirSync(Config.projectScratchpadsPath);
 
     if (!files.length) {
-      window.showInformationMessage('No scratchpads to delete');
+      window.showInformationMessage('Scratchpads: No scratchpads to delete');
       return;
     }
 
@@ -232,7 +232,7 @@ export class ScratchpadsManager {
     const filePath = path.join(Config.projectScratchpadsPath, selection);
     fs.unlinkSync(filePath);
 
-    window.showInformationMessage(`Removed ${selection}`);
+    window.showInformationMessage(`Scratchpads: Removed ${selection}`);
   }
 
   /**
@@ -283,7 +283,7 @@ export class ScratchpadsManager {
 
     if (isPromptForRemoval === undefined || isPromptForRemoval) {
       const answer = await window.showWarningMessage(
-        'Are you sure you want to remove all scratchpads?',
+        'Scratchpads: Are you sure you want to remove all scratchpads?',
         { modal: true },
         'Yes',
         'Always',
@@ -367,6 +367,6 @@ export class ScratchpadsManager {
       fs.unlinkSync(path.join(Config.projectScratchpadsPath, files[i]));
     }
 
-    window.showInformationMessage('Removed all scratchpads');
+    window.showInformationMessage('Scratchpads: Removed all scratchpads');
   }
 }

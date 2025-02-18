@@ -15,7 +15,7 @@ export default class Utils {
       if (Utils.validateFolderCreatable(Config.projectScratchpadsPath)) {
         fs.mkdirSync(Config.projectScratchpadsPath, { recursive: true });
       } else {
-        window.showInformationMessage(`Invalid scratchpads path given (${Config.customPath}). Check configuration...`);
+        window.showInformationMessage(`Scratchpads: Invalid scratchpads path given (${Config.customPath}). Check configuration...`);
         return false;
       }
     }

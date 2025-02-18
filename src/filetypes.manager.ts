@@ -55,12 +55,12 @@ export class FiletypesManager {
     });
 
     if (!ext) {
-      window.showInformationMessage('Canceled...');
+      window.showInformationMessage('Scratchpads: Canceled...');
     } else {
       const existingFiletype = this.getFileType(ext);
 
       if (existingFiletype) {
-        window.showInformationMessage(`Extension already exists (${existingFiletype.name})`);
+        window.showInformationMessage(`Scratchpads: Extension already exists (${existingFiletype.name})`);
       } else {
         const defaultName = this.normalizeExtension(ext).toUpperCase();
         const name = await vscode.window.showInputBox({
