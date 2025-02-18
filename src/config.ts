@@ -36,7 +36,16 @@ export class Config {
    */
   public static getExtensionConfiguration(key: string) {
     const config = this.extensionConfig.inspect(key);
-    return config?.globalValue !== undefined ? config.globalValue : config?.defaultValue;
+    
+    if (config?.workspaceValue !== undefined) {
+      return config.workspaceValue;
+    }
+    
+    if (config?.globalValue !== undefined) {
+      return config.globalValue;
+    }
+    
+    return config?.defaultValue;
   }
 
   /**
