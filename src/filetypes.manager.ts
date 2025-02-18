@@ -26,7 +26,10 @@ export class FiletypesManager {
   }
 
   /**
-   * Select the type of the scratchpad file
+   * Prompts user to select a filetype from available options.
+   * Adds selected type to recent filetypes list if chosen.
+   * @param placeHolder Optional placeholder text for the quick pick dialog
+   * @returns Promise resolving to selected Filetype or undefined if cancelled
    */
   public async selectFiletype(placeHolder?: string): Promise<Filetype | undefined> {
     this.prepareItems();
@@ -52,12 +55,12 @@ export class FiletypesManager {
     });
 
     if (!ext) {
-      window.showInformationMessage('Canceled...');
+      window.showInformationMessage('Scratchpads: Canceled...');
     } else {
       const existingFiletype = this.getFileType(ext);
 
       if (existingFiletype) {
-        window.showInformationMessage(`Extension already exists (${existingFiletype.name})`);
+        window.showInformationMessage(`Scratchpads: Extension already exists (${existingFiletype.name})`);
       } else {
         const defaultName = this.normalizeExtension(ext).toUpperCase();
         const name = await vscode.window.showInputBox({
@@ -80,7 +83,11 @@ export class FiletypesManager {
   }
 
   /**
-   * Load the file types based on https://github.com/blakeembrey/language-map
+   * Loads and organizes filetypes from language-map package.
+   * Separates filetypes into:
+   * - Main filetypes (primary language associations)
+   * - Additional filetypes (secondary extensions)
+   * - Recent filetypes (user's recently used types)
    */
   private loadFiletypes() {
     const langMap: Record<string, any> = require('language-map');
@@ -135,7 +142,11 @@ export class FiletypesManager {
   }
 
   /**
-   * Make sure the file type items are up-to-date and ordered correctly
+   * Prepares the QuickPick items list for filetype selection.
+   * Organizes items into sections:
+   * - Recent filetypes
+   * - All available filetypes (main + additional)
+   * Only rebuilds list if items are marked as dirty
    */
   private prepareItems() {
     if (!this.filetypeItems.length || this.isFiletypeItemsDirty) {

@@ -24,8 +24,12 @@ export class ScratchpadsManager {
   }
 
   /**
-   * Create a new scratchpad file
-   * If file name exists increment counter until a new file can be created
+   * Creates a new scratchpad file with the specified or selected filetype.
+   * Handles:
+   * - Custom filename prompting (if enabled)
+   * - Automatic file numbering for duplicates
+   * - Content pasting and formatting (if enabled)
+   * @param filetype Optional predefined filetype, or prompts for selection
    */
   public async createScratchpad(filetype?: Filetype) {
     if (!filetype) {
@@ -78,20 +82,16 @@ export class ScratchpadsManager {
    */
   public async createScratchpadDefault() {
     let defaultType = this.filetypeManager.getDefaultFiletype();
-    
+
     if (!defaultType) {
       defaultType = await this.filetypeManager.selectFiletype('Select default filetype');
       if (defaultType) {
         // Save the selected type as default (without the dot)
         const defaultExt = defaultType.ext.replace('.', '');
-        await Config.extensionConfig.update(
-          CONFIG_DEFAULT_FILETYPE,
-          defaultExt,
-          vscode.ConfigurationTarget.Global
-        );
+        await Config.setExtensionConfiguration(CONFIG_DEFAULT_FILETYPE, defaultExt);
       }
     }
-    
+
     if (defaultType) {
       await this.createScratchpad(defaultType);
     }
@@ -104,7 +104,7 @@ export class ScratchpadsManager {
     const files = fs.readdirSync(Config.projectScratchpadsPath);
 
     if (!files.length) {
-      window.showInformationMessage('No scratchpads to open');
+      window.showInformationMessage('Scratchpads: No scratchpads to open');
       return;
     }
 
@@ -122,13 +122,15 @@ export class ScratchpadsManager {
   }
 
   /**
-   * Open the most recently created/modified scratchpad file
+   * Opens the most recently modified scratchpad file.
+   * Sorts files by modification time and opens the newest one.
+   * Shows error message if no scratchpads exist or if opening fails.
    */
   public async openLatestScratchpad() {
     const files = fs.readdirSync(Config.projectScratchpadsPath);
 
     if (!files.length) {
-      window.showInformationMessage('No scratchpads to open');
+      window.showInformationMessage('Scratchpads: No scratchpads to open');
       return;
     }
 
@@ -151,7 +153,7 @@ export class ScratchpadsManager {
       const doc = await vscode.workspace.openTextDocument(latestFile.path);
       await vscode.window.showTextDocument(doc, vscode.ViewColumn.One, false);
     } catch (error) {
-      window.showErrorMessage(`Failed to open latest scratchpad: ${error}`);
+      window.showErrorMessage(`Scratchpads: Failed to open latest scratchpad: ${error}`);
     }
   }
 
@@ -162,7 +164,7 @@ export class ScratchpadsManager {
     const activeEditor = window.activeTextEditor;
 
     if (!activeEditor || !this.isScratchpadEditor(activeEditor)) {
-      window.showInformationMessage('Please open a scratchpad file first');
+      window.showInformationMessage('Scratchpads: Please open a scratchpad file first');
       return;
     }
 
@@ -190,7 +192,7 @@ export class ScratchpadsManager {
 
     // Check if target file already exists
     if (fs.existsSync(newFilePath)) {
-      window.showErrorMessage('A file with that name already exists');
+      window.showErrorMessage('Scratchpads: A file with that name already exists');
       return;
     }
 
@@ -205,9 +207,9 @@ export class ScratchpadsManager {
       const doc = await vscode.workspace.openTextDocument(newFilePath);
       window.showTextDocument(doc);
 
-      window.showInformationMessage(`Renamed to ${finalFileName}`);
+      window.showInformationMessage(`Scratchpads: Renamed to ${finalFileName}`);
     } catch (error) {
-      window.showErrorMessage(`Failed to rename file: ${error}`);
+      window.showErrorMessage(`Scratchpads: Failed to rename file: ${error}`);
     }
   }
 
@@ -218,7 +220,7 @@ export class ScratchpadsManager {
     const files = fs.readdirSync(Config.projectScratchpadsPath);
 
     if (!files.length) {
-      window.showInformationMessage('No scratchpads to delete');
+      window.showInformationMessage('Scratchpads: No scratchpads to delete');
       return;
     }
 
@@ -230,7 +232,7 @@ export class ScratchpadsManager {
     const filePath = path.join(Config.projectScratchpadsPath, selection);
     fs.unlinkSync(filePath);
 
-    window.showInformationMessage(`Removed ${selection}`);
+    window.showInformationMessage(`Scratchpads: Removed ${selection}`);
   }
 
   /**
@@ -281,7 +283,7 @@ export class ScratchpadsManager {
 
     if (isPromptForRemoval === undefined || isPromptForRemoval) {
       const answer = await window.showWarningMessage(
-        'Are you sure you want to remove all scratchpads?',
+        'Scratchpads: Are you sure you want to remove all scratchpads?',
         { modal: true },
         'Yes',
         'Always',
@@ -314,9 +316,11 @@ export class ScratchpadsManager {
   }
 
   /**
-   * Close all open tabs which edit a scratchpad document.
-   * Use a "hack" which uses workbench actions (closeActiveEditor and nextEditor)
-   * since there is no access to open tabs.
+   * Closes all open scratchpad tabs.
+   * Uses a circular iteration strategy since VSCode doesn't provide direct tab access:
+   * 1. Starts from active editor
+   * 2. Cycles through all tabs
+   * 3. Closes scratchpad tabs until returning to starting point
    */
   private async closeTabs() {
     let initial = window.activeTextEditor;
@@ -363,6 +367,6 @@ export class ScratchpadsManager {
       fs.unlinkSync(path.join(Config.projectScratchpadsPath, files[i]));
     }
 
-    window.showInformationMessage('Removed all scratchpads');
+    window.showInformationMessage('Scratchpads: Removed all scratchpads');
   }
 }

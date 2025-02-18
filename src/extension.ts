@@ -5,8 +5,11 @@ import {ScratchpadsManager} from './scratchpads.manager';
 import Utils from './utils';
 
 /**
- * This method is called when the extension is activated
- * Good place for initialization.
+ * Extension activation handler. Sets up:
+ * - Configuration initialization
+ * - Command registrations
+ * - Configuration change listeners
+ * @param context The extension context provided by VSCode
  */
 export function activate(context: vscode.ExtensionContext) {
   Config.init(context);
@@ -39,7 +42,7 @@ export function activate(context: vscode.ExtensionContext) {
 }
 
 /**
- * This method is called when the extension is deactivated.
- * Good place for cleanups.
+ * Extension deactivation handler.
+ * Currently no cleanup is needed.
  */
 export function deactivate() {}

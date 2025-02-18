@@ -61,3 +61,8 @@
 - [#41](https://github.com/buenon/scratchpads/issues/41) - Added default filetype configuration
 - [#42](https://github.com/buenon/scratchpads/issues/42) - Added scratchpad prefix configuration
 
+## 1.0.2
+
+- [#54](https://github.com/buenon/scratchpads/issues/54) - Load configuration in the correct order (workspace > user > default)
+- Dependencies updated to address security vulnerabilities
+
