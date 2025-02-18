@@ -2,11 +2,6 @@ name: Publish Extension
 
 on:
   workflow_dispatch:
-    inputs:
-      version:
-        description: 'New version number (e.g., 1.2.0)'
-        required: true
-        type: string
 
 jobs:
   publish:
@@ -21,39 +16,15 @@ jobs:
           node-version: '18'
           registry-url: 'https://registry.npmjs.org'
 
-      - name: Get current version
+      - name: Get version from package.json
         id: get_version
-        run: echo "current_version=$(node -p "require('./package.json').version")" >> $GITHUB_OUTPUT
-
-      - name: Suggest next version
-        id: suggest_version
-        run: |
-          current=${{ steps.get_version.outputs.current_version }}
-          IFS='.' read -r major minor patch <<< "$current"
-          next_minor=$((minor + 1))
-          echo "suggested_version=$major.$next_minor.0" >> $GITHUB_OUTPUT
-        shell: bash
-
-      - name: Update package.json version
-        run: npm version ${{ inputs.version }} --no-git-tag-version
+        run: echo "version=$(node -p "require('./package.json').version")" >> $GITHUB_OUTPUT
 
       - name: Install dependencies
         run: npm ci
 
       - name: Build
         run: npm run build
-
-      - name: Create Git Tag
-        run: |
-          git config --local user.email "action@github.com"
-          git config --local user.name "GitHub Action"
-          git add package.json
-          git commit -m "Release v${{ inputs.version }}"
-          git tag "v${{ inputs.version }}"
-          git push
-          git push --tags
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       # Publish to Visual Studio Marketplace
       - name: Publish to VS Code Marketplace
