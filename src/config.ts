@@ -14,6 +14,11 @@ export class Config {
   public static projectScratchpadsPath: string;
   public static recentFiletypesFilePath: string;
 
+  /**
+   * Initializes the configuration with the given extension context.
+   * Sets up global paths and loads extension configuration settings.
+   * @param context The VSCode extension context
+   */
   public static init(context: vscode.ExtensionContext) {
     this.context = context;
     this.extensionConfig = vscode.workspace.getConfiguration('scratchpads');
@@ -22,6 +27,11 @@ export class Config {
     this.recalculatePaths();
   }
 
+  /**
+   * Recalculates all path variables based on current configuration.
+   * This includes the custom path, scratchpads root path, and project-specific paths.
+   * Called when configuration changes or during initialization.
+   */
   public static recalculatePaths() {
     this.customPath = this.getExtensionConfiguration(CONFIG_SCRATCHPADS_FOLDER) as string;
 
@@ -31,8 +41,10 @@ export class Config {
   }
 
   /**
-   * Get the extension configuration (exposed in package.json) for the given key
-   * @param key
+   * Retrieves configuration values with proper fallback chain:
+   * workspace → global → default value
+   * @param key The configuration key to look up
+   * @returns The configuration value, or undefined if not found
    */
   public static getExtensionConfiguration(key: string) {
     const config = this.extensionConfig.inspect(key);

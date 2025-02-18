@@ -24,8 +24,12 @@ export class ScratchpadsManager {
   }
 
   /**
-   * Create a new scratchpad file
-   * If file name exists increment counter until a new file can be created
+   * Creates a new scratchpad file with the specified or selected filetype.
+   * Handles:
+   * - Custom filename prompting (if enabled)
+   * - Automatic file numbering for duplicates
+   * - Content pasting and formatting (if enabled)
+   * @param filetype Optional predefined filetype, or prompts for selection
    */
   public async createScratchpad(filetype?: Filetype) {
     if (!filetype) {
@@ -118,7 +122,9 @@ export class ScratchpadsManager {
   }
 
   /**
-   * Open the most recently created/modified scratchpad file
+   * Opens the most recently modified scratchpad file.
+   * Sorts files by modification time and opens the newest one.
+   * Shows error message if no scratchpads exist or if opening fails.
    */
   public async openLatestScratchpad() {
     const files = fs.readdirSync(Config.projectScratchpadsPath);
@@ -310,9 +316,11 @@ export class ScratchpadsManager {
   }
 
   /**
-   * Close all open tabs which edit a scratchpad document.
-   * Use a "hack" which uses workbench actions (closeActiveEditor and nextEditor)
-   * since there is no access to open tabs.
+   * Closes all open scratchpad tabs.
+   * Uses a circular iteration strategy since VSCode doesn't provide direct tab access:
+   * 1. Starts from active editor
+   * 2. Cycles through all tabs
+   * 3. Closes scratchpad tabs until returning to starting point
    */
   private async closeTabs() {
     let initial = window.activeTextEditor;

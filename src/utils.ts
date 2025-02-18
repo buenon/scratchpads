@@ -5,6 +5,11 @@ import { Config } from './config';
 import { ACTIONS_TIMEOUT } from './consts';
 
 export default class Utils {
+  /**
+   * Ensures the scratchpads directory exists and is writable.
+   * Creates the directory if missing and validates path accessibility.
+   * @returns boolean indicating if the folder is ready for use
+   */
   public static confirmFolder(): boolean {
     if (!fs.existsSync(Config.projectScratchpadsPath)) {
       if (Utils.validateFolderCreatable(Config.projectScratchpadsPath)) {
@@ -42,6 +47,12 @@ export default class Utils {
     return new Promise((f) => setTimeout(f, ms));
   }
 
+  /**
+   * Checks if a folder path is valid and creatable.
+   * Traverses up the path tree to find first existing parent.
+   * @param p The folder path to validate
+   * @returns boolean indicating if the folder can be created
+   */
   public static validateFolderCreatable(p: string) {
     const nodes = p.split(path.sep);
 
