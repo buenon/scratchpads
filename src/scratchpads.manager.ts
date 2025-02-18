@@ -78,20 +78,16 @@ export class ScratchpadsManager {
    */
   public async createScratchpadDefault() {
     let defaultType = this.filetypeManager.getDefaultFiletype();
-    
+
     if (!defaultType) {
       defaultType = await this.filetypeManager.selectFiletype('Select default filetype');
       if (defaultType) {
         // Save the selected type as default (without the dot)
         const defaultExt = defaultType.ext.replace('.', '');
-        await Config.extensionConfig.update(
-          CONFIG_DEFAULT_FILETYPE,
-          defaultExt,
-          vscode.ConfigurationTarget.Global
-        );
+        await Config.setExtensionConfiguration(CONFIG_DEFAULT_FILETYPE, defaultExt);
       }
     }
-    
+
     if (defaultType) {
       await this.createScratchpad(defaultType);
     }

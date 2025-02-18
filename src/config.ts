@@ -5,7 +5,7 @@ import { CONFIG_SCRATCHPADS_FOLDER, RECENT_FILETYPES_FILE, SCRATCHPADS_FOLDER_NA
 
 export class Config {
   public static context: vscode.ExtensionContext;
-  public static extensionConfig: vscode.WorkspaceConfiguration;
+  private static extensionConfig: vscode.WorkspaceConfiguration;
 
   public static globalPath: string;
   public static customPath: string;
@@ -50,11 +50,12 @@ export class Config {
 
   /**
    * Set an extension configuration based on the given key and value.
-   * The configuration will be saved on the global target.
-   * @param key
-   * @param value
+   * @param key Configuration key
+   * @param value Configuration value
+   * @param target Configuration target (defaults to Global)
+   * @returns Promise that resolves when the configuration is updated
    */
-  public static setExtensionConfiguration(key: string, value: any) {
-    this.extensionConfig.update(key, value, true);
+  public static async setExtensionConfiguration(key: string, value: any, target: vscode.ConfigurationTarget = vscode.ConfigurationTarget.Global): Promise<void> {
+    await this.extensionConfig.update(key, value, target);
   }
 }
