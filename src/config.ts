@@ -1,7 +1,7 @@
 import * as path from 'path';
 import { Md5 } from 'ts-md5';
 import * as vscode from 'vscode';
-import { CONFIG_SCRATCHPADS_FOLDER, RECENT_FILETYPES_FILE, SCRATCHPADS_FOLDER_NAME } from './consts';
+import { CONFIG_SCRATCHPADS_FOLDER, CONFIG_USE_SUBFOLDERS, RECENT_FILETYPES_FILE, SCRATCHPADS_FOLDER_NAME } from './consts';
 
 export class Config {
   public static context: vscode.ExtensionContext;
@@ -34,9 +34,17 @@ export class Config {
    */
   public static recalculatePaths() {
     this.customPath = this.getExtensionConfiguration(CONFIG_SCRATCHPADS_FOLDER) as string;
+    const useSubfolders = this.getExtensionConfiguration(CONFIG_USE_SUBFOLDERS) as boolean;
 
     this.scratchpadsRootPath = path.join(this.customPath || this.globalPath, SCRATCHPADS_FOLDER_NAME);
-    this.projectScratchpadsPath = path.join(this.scratchpadsRootPath, this.projectPathMD5);
+    
+    // Use subfolders by default (true) unless explicitly disabled
+    if (useSubfolders !== false) {
+      this.projectScratchpadsPath = path.join(this.scratchpadsRootPath, this.projectPathMD5);
+    } else {
+      this.projectScratchpadsPath = this.scratchpadsRootPath;
+    }
+    
     this.recentFiletypesFilePath = path.join(this.scratchpadsRootPath, RECENT_FILETYPES_FILE);
   }
 
