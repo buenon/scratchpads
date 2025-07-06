@@ -12,3 +12,4 @@ export const CONFIG_PROMPT_FOR_FILENAME = 'promptForFilename';
 export const CONFIG_PROMPT_FOR_REMOVAL = 'promptForRemoval';
 export const CONFIG_RENAME_WITH_EXTENSION = 'renameWithExtension';
 export const CONFIG_SCRATCHPADS_FOLDER = 'scratchpadsFolder';
+export const CONFIG_USE_SUBFOLDERS = 'useSubfolders';

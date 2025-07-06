@@ -65,6 +65,11 @@
           "type": "string",
           "default": "",
           "description": "The default file extension to use with 'New scratchpad (default)' command (e.g., 'js', 'ts', 'py')"
+        },
+        "scratchpads.useSubfolders": {
+          "type": "boolean",
+          "default": true,
+          "description": "Save scratchpads in project-specific subfolders. When disabled, all scratchpads are saved in a single folder."
         }
       }
     },

@@ -1,7 +1,7 @@
 import * as vscode from 'vscode';
-import {Config} from './config';
-import {FiletypesManager} from './filetypes.manager';
-import {ScratchpadsManager} from './scratchpads.manager';
+import { Config } from './config';
+import { FiletypesManager } from './filetypes.manager';
+import { ScratchpadsManager } from './scratchpads.manager';
 import Utils from './utils';
 
 /**
@@ -32,10 +32,11 @@ export function activate(context: vscode.ExtensionContext) {
     context.subscriptions.push(cmd);
   }
 
-  vscode.workspace.onDidChangeConfiguration((event) => {
-    const affected = event.affectsConfiguration('scratchpads.scratchpadsFolder');
+  vscode.workspace.onDidChangeConfiguration((event: vscode.ConfigurationChangeEvent) => {
+    const affectedFolder = event.affectsConfiguration('scratchpads.scratchpadsFolder');
+    const affectedSubfolders = event.affectsConfiguration('scratchpads.useSubfolders');
 
-    if (affected) {
+    if (affectedFolder || affectedSubfolders) {
       Config.recalculatePaths();
     }
   });
