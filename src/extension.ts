@@ -1,7 +1,8 @@
 import * as vscode from 'vscode';
-import {Config} from './config';
-import {FiletypesManager} from './filetypes.manager';
-import {ScratchpadsManager} from './scratchpads.manager';
+import { Config } from './config';
+import { FiletypesManager } from './filetypes.manager';
+import { ScratchpadTreeProvider } from './scratchpad-tree-provider';
+import { ScratchpadsManager } from './scratchpads.manager';
 import Utils from './utils';
 
 /**
@@ -15,6 +16,14 @@ export function activate(context: vscode.ExtensionContext) {
   Config.init(context);
 
   const scratchpadsManager = new ScratchpadsManager(new FiletypesManager());
+  
+  // Register tree view if enabled
+  const treeViewProvider = new ScratchpadTreeProvider();
+  const treeView = vscode.window.createTreeView('scratchpads', {
+    treeDataProvider: treeViewProvider,
+    showCollapseAll: false
+  });
+  context.subscriptions.push(treeView);
 
   const commands: { [key: string]: (...args: any[]) => any } = {
     'scratchpads.newScratchpad': () => Utils.confirmFolder() && scratchpadsManager.createScratchpad(),

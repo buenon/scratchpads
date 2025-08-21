@@ -73,6 +73,15 @@
         }
       }
     },
+    "views": {
+      "explorer": [
+        {
+          "id": "scratchpads",
+          "name": "SCRATCHPADS",
+          "when": "config.scratchpads.showInExplorer"
+        }
+      ]
+    },
     "commands": [
       {
         "command": "scratchpads.newScratchpad",
