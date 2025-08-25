@@ -1,8 +1,8 @@
 import * as vscode from 'vscode';
-import { Config } from './config';
-import { FiletypesManager } from './filetypes.manager';
-import { ScratchpadsManager } from './scratchpads.manager';
-import { ScratchpadsViewProvider, sortType } from './scratchpads.view';
+import {Config} from './config';
+import {FiletypesManager} from './filetypes.manager';
+import {ScratchpadsManager} from './scratchpads.manager';
+import {ScratchpadsViewProvider, sortType} from './scratchpads.view';
 import Utils from './utils';
 
 /**
