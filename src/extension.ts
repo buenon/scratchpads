@@ -1,8 +1,8 @@
 import * as vscode from 'vscode';
-import {Config} from './config';
-import {FiletypesManager} from './filetypes.manager';
-import {ScratchpadsManager} from './scratchpads.manager';
-import {ScratchpadsViewProvider, SortType} from './scratchpads.view';
+import { Config } from './config';
+import { FiletypesManager } from './filetypes.manager';
+import { ScratchpadsManager } from './scratchpads.manager';
+import { ScratchpadsViewProvider, sortType } from './scratchpads.view';
 import Utils from './utils';
 
 /**
@@ -17,7 +17,7 @@ export function activate(context: vscode.ExtensionContext) {
 
   const scratchpadsManager = new ScratchpadsManager(new FiletypesManager());
   const scratchpadsViewProvider = new ScratchpadsViewProvider();
-  
+
   // Register the tree data provider
   vscode.window.registerTreeDataProvider('scratchpads', scratchpadsViewProvider);
 
@@ -44,24 +44,26 @@ export function activate(context: vscode.ExtensionContext) {
     'scratchpads.newFiletype': () => Utils.confirmFolder() && scratchpadsManager.newFiletype(),
     // View commands
     'scratchpads.refreshView': () => scratchpadsViewProvider.refresh(),
-    'scratchpads.sortByName': () => scratchpadsViewProvider.setSortType(SortType.Name),
-    'scratchpads.sortByDate': () => scratchpadsViewProvider.setSortType(SortType.Date),
-    'scratchpads.sortByType': () => scratchpadsViewProvider.setSortType(SortType.Type),
+    'scratchpads.sortByName': () => scratchpadsViewProvider.setSortType(sortType.name),
+    'scratchpads.sortByDate': () => scratchpadsViewProvider.setSortType(sortType.date),
+    'scratchpads.sortByType': () => scratchpadsViewProvider.setSortType(sortType.type),
     // Context menu commands for view items
     'scratchpads.openScratchpadFromView': (item: any) => {
-      if (item && item.fileName) {
-        scratchpadsManager.openScratchpadByName(item.fileName);
+      if (Utils.confirmFolder() && item?.fileName) {
+        scratchpadsManager.openScratchpadByName(item.fileName).then(() => {
+          scratchpadsViewProvider.refresh();
+        });
       }
     },
     'scratchpads.renameScratchpadFromView': (item: any) => {
-      if (item && item.fileName) {
+      if (Utils.confirmFolder() && item?.fileName) {
         scratchpadsManager.renameScratchpadByName(item.fileName).then(() => {
           scratchpadsViewProvider.refresh();
         });
       }
     },
     'scratchpads.removeScratchpadFromView': (item: any) => {
-      if (item && item.fileName) {
+      if (Utils.confirmFolder() && item?.fileName) {
         scratchpadsManager.removeScratchpadByName(item.fileName).then(() => {
           scratchpadsViewProvider.refresh();
         });

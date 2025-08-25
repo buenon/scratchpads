@@ -1,13 +1,15 @@
 import * as fs from 'fs';
 import * as path from 'path';
 import * as vscode from 'vscode';
-import { Config } from './config';
+import {Config} from './config';
 
-export enum SortType {
-  Name = 'name',
-  Date = 'date',
-  Type = 'type'
-}
+export const sortType = {
+  name: 'name',
+  date: 'date',
+  type: 'type'
+} as const;
+
+export type SortType = typeof sortType[keyof typeof sortType];
 
 export class ScratchpadItem extends vscode.TreeItem {
   constructor(
@@ -42,7 +44,7 @@ export class ScratchpadItem extends vscode.TreeItem {
   }
   
   private formatFileSize(bytes: number): string {
-    if (bytes === 0) return '0 B';
+    if (bytes === 0) {return '0 B';}
     const k = 1024;
     const sizes = ['B', 'KB', 'MB', 'GB'];
     const i = Math.floor(Math.log(bytes) / Math.log(k));
@@ -80,7 +82,7 @@ export class ScratchpadsViewProvider implements vscode.TreeDataProvider<Scratchp
   private _onDidChangeTreeData: vscode.EventEmitter<ScratchpadItem | undefined | null | void> = new vscode.EventEmitter<ScratchpadItem | undefined | null | void>();
   readonly onDidChangeTreeData: vscode.Event<ScratchpadItem | undefined | null | void> = this._onDidChangeTreeData.event;
   
-  private sortType: SortType = SortType.Name;
+  private sortType: SortType = sortType.name;
   private sortAscending: boolean = true;
   
   constructor() {
@@ -148,13 +150,13 @@ export class ScratchpadsViewProvider implements vscode.TreeDataProvider<Scratchp
       let comparison = 0;
       
       switch (this.sortType) {
-        case SortType.Name:
+        case sortType.name:
           comparison = a.fileName.localeCompare(b.fileName);
           break;
-        case SortType.Date:
+        case sortType.date:
           comparison = a.fileStats.mtime.getTime() - b.fileStats.mtime.getTime();
           break;
-        case SortType.Type:
+        case sortType.type:
           const extA = path.extname(a.fileName);
           const extB = path.extname(b.fileName);
           comparison = extA.localeCompare(extB);

@@ -1,8 +1,8 @@
 import * as fs from 'fs';
 import * as path from 'path';
 import * as vscode from 'vscode';
-import { window } from 'vscode';
-import { Config } from './config';
+import {window} from 'vscode';
+import {Config} from './config';
 import {
   CONFIG_AUTO_FORMAT,
   CONFIG_AUTO_PASTE,
@@ -13,7 +13,7 @@ import {
   CONFIG_RENAME_WITH_EXTENSION,
   DEFAULT_FILE_PREFIX,
 } from './consts';
-import { Filetype, FiletypesManager } from './filetypes.manager';
+import {Filetype, FiletypesManager} from './filetypes.manager';
 import Utils from './utils';
 
 export class ScratchpadsManager {
@@ -239,13 +239,16 @@ export class ScratchpadsManager {
    * Open a specific scratchpad file by filename
    */
   public async openScratchpadByName(fileName: string) {
-    const filePath = path.join(Config.projectScratchpadsPath, fileName);
-    if (fs.existsSync(filePath)) {
-      const doc = await vscode.workspace.openTextDocument(filePath);
-      window.showTextDocument(doc, vscode.ViewColumn.One, false);
-    } else {
+    const files = fs.readdirSync(Config.projectScratchpadsPath);
+    
+    if (!files.includes(fileName)) {
       window.showErrorMessage(`Scratchpads: File ${fileName} not found`);
+      return;
     }
+
+    const filePath = path.join(Config.projectScratchpadsPath, fileName);
+    const doc = await vscode.workspace.openTextDocument(filePath);
+    vscode.window.showTextDocument(doc, vscode.ViewColumn.One, false);
   }
 
   /**
@@ -259,53 +262,24 @@ export class ScratchpadsManager {
       return;
     }
 
-    const currentFileExt = path.extname(fileName);
-    const currentBaseName = path.basename(fileName, currentFileExt);
-    const renameWithExt = Config.getExtensionConfiguration(CONFIG_RENAME_WITH_EXTENSION);
+    // Create a mock editor to reuse the existing rename logic
+    const mockEditor = {
+      document: {
+        fileName: currentFilePath,
+        save: async () => {}
+      }
+    };
 
-    const inputValue = renameWithExt ? fileName : currentBaseName;
-
-    const newFileName = await window.showInputBox({
-      placeHolder: 'Enter new filename:',
-      value: inputValue,
-    });
-
-    if (!newFileName) {
-      return;
-    }
-
-    // Determine the final path based on whether extension renaming is allowed
-    const finalFileName = renameWithExt ? newFileName : `${newFileName}${currentFileExt}`;
-    const newFilePath = path.join(Config.projectScratchpadsPath, finalFileName);
-
-    // Check if target file already exists
-    if (fs.existsSync(newFilePath)) {
-      window.showErrorMessage('Scratchpads: A file with that name already exists');
-      return;
-    }
+    // Temporarily set the active editor to our mock
+    const originalActiveEditor = window.activeTextEditor;
+    (window as any).activeTextEditor = mockEditor;
 
     try {
-      // Check if file is currently open and close it
-      const openEditors = vscode.window.visibleTextEditors;
-      const openEditor = openEditors.find(editor => editor.document.fileName === currentFilePath);
-      
-      if (openEditor) {
-        await openEditor.document.save();
-        await vscode.window.showTextDocument(openEditor.document, openEditor.viewColumn);
-        await vscode.commands.executeCommand('workbench.action.closeActiveEditor');
-      }
-
-      fs.renameSync(currentFilePath, newFilePath);
-
-      // Reopen the renamed file if it was previously open
-      if (openEditor) {
-        const doc = await vscode.workspace.openTextDocument(newFilePath);
-        window.showTextDocument(doc, openEditor.viewColumn);
-      }
-
-      window.showInformationMessage(`Scratchpads: Renamed to ${finalFileName}`);
-    } catch (error) {
-      window.showErrorMessage(`Scratchpads: Failed to rename file: ${error}`);
+      // Reuse the existing renameScratchpad logic
+      await this.renameScratchpad();
+    } finally {
+      // Restore the original active editor
+      (window as any).activeTextEditor = originalActiveEditor;
     }
   }
 
@@ -313,38 +287,25 @@ export class ScratchpadsManager {
    * Remove a specific scratchpad file by filename
    */
   public async removeScratchpadByName(fileName: string) {
-    const filePath = path.join(Config.projectScratchpadsPath, fileName);
-    
-    if (!fs.existsSync(filePath)) {
+    const files = fs.readdirSync(Config.projectScratchpadsPath);
+
+    if (!files.includes(fileName)) {
       window.showErrorMessage(`Scratchpads: File ${fileName} not found`);
       return;
     }
 
-    // Ask for confirmation
-    const confirmation = await window.showWarningMessage(
-      `Are you sure you want to delete "${fileName}"?`,
-      { modal: true },
-      'Delete'
-    );
-
-    if (confirmation !== 'Delete') {
-      return;
-    }
-
+    // Create a temporary selection to reuse existing removeScratchpad logic
+    const originalShowQuickPick = window.showQuickPick;
+    
     try {
-      // Check if file is currently open and close it
-      const openEditors = vscode.window.visibleTextEditors;
-      const openEditor = openEditors.find(editor => editor.document.fileName === filePath);
+      // Mock the showQuickPick to return our specific fileName
+      (window as any).showQuickPick = async () => fileName;
       
-      if (openEditor) {
-        await vscode.window.showTextDocument(openEditor.document, openEditor.viewColumn);
-        await vscode.commands.executeCommand('workbench.action.closeActiveEditor');
-      }
-
-      fs.unlinkSync(filePath);
-      window.showInformationMessage(`Scratchpads: Removed ${fileName}`);
-    } catch (error) {
-      window.showErrorMessage(`Scratchpads: Failed to remove file: ${error}`);
+      // Reuse the existing removeScratchpad logic
+      await this.removeScratchpad();
+    } finally {
+      // Restore the original showQuickPick function
+      (window as any).showQuickPick = originalShowQuickPick;
     }
   }
 
