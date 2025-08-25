@@ -1,12 +1,12 @@
 import * as fs from 'fs';
 import * as path from 'path';
 import * as vscode from 'vscode';
-import {Config} from './config';
+import { Config } from './config';
 
 export const sortType = {
   name: 'name',
   date: 'date',
-  type: 'type'
+  type: 'type',
 } as const;
 
 export type SortType = typeof sortType[keyof typeof sortType];
@@ -16,41 +16,43 @@ export class ScratchpadItem extends vscode.TreeItem {
     public readonly fileName: string,
     public readonly filePath: string,
     public readonly fileStats: fs.Stats,
-    public readonly collapsibleState: vscode.TreeItemCollapsibleState
+    public readonly collapsibleState: vscode.TreeItemCollapsibleState,
   ) {
     super(fileName, collapsibleState);
-    
+
     this.tooltip = `${fileName}\nModified: ${fileStats.mtime.toLocaleString()}\nSize: ${fileStats.size} bytes`;
     this.description = this.getFileDescription();
     this.contextValue = 'scratchpadFile';
     this.resourceUri = vscode.Uri.file(filePath);
-    
+
     // Set command to open file on click
     this.command = {
       command: 'vscode.open',
       title: 'Open',
-      arguments: [vscode.Uri.file(filePath)]
+      arguments: [vscode.Uri.file(filePath)],
     };
-    
+
     // Set icon based on file extension
     this.iconPath = this.getFileIcon();
   }
-  
+
   private getFileDescription(): string {
     const ext = path.extname(this.fileName);
     const size = this.formatFileSize(this.fileStats.size);
     const date = this.fileStats.mtime.toLocaleDateString();
     return `${ext} • ${size} • ${date}`;
   }
-  
+
   private formatFileSize(bytes: number): string {
-    if (bytes === 0) {return '0 B';}
+    if (bytes === 0) {
+      return '0 B';
+    }
     const k = 1024;
     const sizes = ['B', 'KB', 'MB', 'GB'];
     const i = Math.floor(Math.log(bytes) / Math.log(k));
     return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i];
   }
-  
+
   private getFileIcon(): vscode.ThemeIcon {
     const ext = path.extname(this.fileName).toLowerCase();
     switch (ext) {
@@ -79,21 +81,24 @@ export class ScratchpadItem extends vscode.TreeItem {
 }
 
 export class ScratchpadsViewProvider implements vscode.TreeDataProvider<ScratchpadItem> {
-  private _onDidChangeTreeData: vscode.EventEmitter<ScratchpadItem | undefined | null | void> = new vscode.EventEmitter<ScratchpadItem | undefined | null | void>();
-  readonly onDidChangeTreeData: vscode.Event<ScratchpadItem | undefined | null | void> = this._onDidChangeTreeData.event;
-  
-  private sortType: SortType = sortType.name;
-  private sortAscending: boolean = true;
-  
+  private _onDidChangeTreeData: vscode.EventEmitter<ScratchpadItem | undefined | null | void> = new vscode.EventEmitter<
+    ScratchpadItem | undefined | null | void
+  >();
+  readonly onDidChangeTreeData: vscode.Event<ScratchpadItem | undefined | null | void> =
+    this._onDidChangeTreeData.event;
+
+  private sortType: SortType = sortType.type;
+  private sortAscending = true;
+
   constructor() {
     // Watch for file system changes in scratchpads folder
     this.watchScratchpadsFolder();
   }
-  
+
   refresh(): void {
     this._onDidChangeTreeData.fire();
   }
-  
+
   setSortType(sortType: SortType): void {
     if (this.sortType === sortType) {
       this.sortAscending = !this.sortAscending;
@@ -103,52 +108,47 @@ export class ScratchpadsViewProvider implements vscode.TreeDataProvider<Scratchp
     }
     this.refresh();
   }
-  
+
   getTreeItem(element: ScratchpadItem): vscode.TreeItem {
     return element;
   }
-  
+
   getChildren(element?: ScratchpadItem): Thenable<ScratchpadItem[]> {
     if (!element) {
       return Promise.resolve(this.getScratchpadFiles());
     }
     return Promise.resolve([]);
   }
-  
+
   private getScratchpadFiles(): ScratchpadItem[] {
     try {
       if (!fs.existsSync(Config.projectScratchpadsPath)) {
         return [];
       }
-      
+
       const files = fs.readdirSync(Config.projectScratchpadsPath);
       const scratchpadItems: ScratchpadItem[] = [];
-      
+
       for (const file of files) {
         const filePath = path.join(Config.projectScratchpadsPath, file);
         const stats = fs.statSync(filePath);
-        
+
         if (stats.isFile()) {
-          scratchpadItems.push(new ScratchpadItem(
-            file,
-            filePath,
-            stats,
-            vscode.TreeItemCollapsibleState.None
-          ));
+          scratchpadItems.push(new ScratchpadItem(file, filePath, stats, vscode.TreeItemCollapsibleState.None));
         }
       }
-      
+
       return this.sortFiles(scratchpadItems);
     } catch (error) {
       console.error('Error reading scratchpad files:', error);
       return [];
     }
   }
-  
+
   private sortFiles(files: ScratchpadItem[]): ScratchpadItem[] {
     return files.sort((a, b) => {
       let comparison = 0;
-      
+
       switch (this.sortType) {
         case sortType.name:
           comparison = a.fileName.localeCompare(b.fileName);
@@ -165,11 +165,11 @@ export class ScratchpadsViewProvider implements vscode.TreeDataProvider<Scratchp
           }
           break;
       }
-      
+
       return this.sortAscending ? comparison : -comparison;
     });
   }
-  
+
   private watchScratchpadsFolder(): void {
     if (fs.existsSync(Config.projectScratchpadsPath)) {
       const watcher = fs.watch(Config.projectScratchpadsPath, (eventType, filename) => {
@@ -177,7 +177,7 @@ export class ScratchpadsViewProvider implements vscode.TreeDataProvider<Scratchp
           this.refresh();
         }
       });
-      
+
       // Clean up watcher when extension is deactivated
       vscode.workspace.onDidChangeConfiguration(() => {
         watcher.close();

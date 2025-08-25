@@ -38,9 +38,27 @@ export function activate(context: vscode.ExtensionContext) {
     },
     'scratchpads.openScratchpad': () => Utils.confirmFolder() && scratchpadsManager.openScratchpad(),
     'scratchpads.openLatestScratchpad': () => Utils.confirmFolder() && scratchpadsManager.openLatestScratchpad(),
-    'scratchpads.renameScratchpad': () => Utils.confirmFolder() && scratchpadsManager.renameScratchpad(),
-    'scratchpads.removeAllScratchpads': () => Utils.confirmFolder() && scratchpadsManager.removeAllScratchpads(),
-    'scratchpads.removeScratchpad': () => Utils.confirmFolder() && scratchpadsManager.removeScratchpad(),
+    'scratchpads.renameScratchpad': () => {
+      if (Utils.confirmFolder()) {
+        scratchpadsManager.renameScratchpad().then(() => {
+          scratchpadsViewProvider.refresh();
+        });
+      }
+    },
+    'scratchpads.removeAllScratchpads': () => {
+      if (Utils.confirmFolder()) {
+        scratchpadsManager.removeAllScratchpads().then(() => {
+          scratchpadsViewProvider.refresh();
+        });
+      }
+    },
+    'scratchpads.removeScratchpad': () => {
+      if (Utils.confirmFolder()) {
+        scratchpadsManager.removeScratchpad().then(() => {
+          scratchpadsViewProvider.refresh();
+        });
+      }
+    },
     'scratchpads.newFiletype': () => Utils.confirmFolder() && scratchpadsManager.newFiletype(),
     // View commands
     'scratchpads.refreshView': () => scratchpadsViewProvider.refresh(),
