@@ -1,7 +1,7 @@
 import * as fs from 'fs';
 import * as path from 'path';
 import * as vscode from 'vscode';
-import { Config } from './config';
+import {Config} from './config';
 
 export const sortType = {
   name: 'name',
