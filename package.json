@@ -68,6 +68,62 @@
         }
       }
     },
+    "views": {
+      "explorer": [
+        {
+          "id": "scratchpads",
+          "name": "Scratchpads",
+          "when": "true",
+          "icon": "$(file-text)"
+        }
+      ]
+    },
+    "menus": {
+      "view/title": [
+        {
+          "command": "scratchpads.newScratchpad",
+          "when": "view == scratchpads",
+          "group": "navigation@1"
+        },
+        {
+          "command": "scratchpads.refreshView",
+          "when": "view == scratchpads",
+          "group": "navigation@2"
+        },
+        {
+          "command": "scratchpads.sortByName",
+          "when": "view == scratchpads",
+          "group": "1_sort"
+        },
+        {
+          "command": "scratchpads.sortByDate",
+          "when": "view == scratchpads",
+          "group": "1_sort"
+        },
+        {
+          "command": "scratchpads.sortByType",
+          "when": "view == scratchpads",
+          "group": "1_sort"
+        }
+      ],
+      "view/item/context": [
+        {
+          "command": "scratchpads.openScratchpadFromView",
+          "when": "view == scratchpads && viewItem == scratchpadFile",
+          "group": "inline"
+        },
+        {
+          "command": "scratchpads.renameScratchpadFromView",
+          "when": "view == scratchpads && viewItem == scratchpadFile",
+          "group": "1_modification"
+        },
+        {
+          "command": "scratchpads.removeScratchpadFromView",
+          "when": "view == scratchpads && viewItem == scratchpadFile",
+          "group": "1_modification"
+        }
+      ]
+    },
     "commands": [
       {
         "command": "scratchpads.newScratchpad",
@@ -100,6 +156,38 @@
       {
         "command": "scratchpads.newFiletype",
         "title": "Scratchpads: New filetype"
+      },
+      {
+        "command": "scratchpads.refreshView",
+        "title": "Refresh",
+        "icon": "$(refresh)"
+      },
+      {
+        "command": "scratchpads.sortByName",
+        "title": "Sort by Name",
+        "icon": "$(sort-precedence)"
+      },
+      {
+        "command": "scratchpads.sortByDate",
+        "title": "Sort by Date",
+        "icon": "$(calendar)"
+      },
+      {
+        "command": "scratchpads.sortByType",
+        "title": "Sort by Type",
+        "icon": "$(symbol-file)"
+      },
+      {
+        "command": "scratchpads.openScratchpadFromView",
+        "title": "Open"
+      },
+      {
+        "command": "scratchpads.renameScratchpadFromView",
+        "title": "Rename"
+      },
+      {
+        "command": "scratchpads.removeScratchpadFromView",
+        "title": "Delete"
       }
     ]
   },

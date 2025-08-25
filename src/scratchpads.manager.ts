@@ -225,14 +225,127 @@ export class ScratchpadsManager {
     }
 
     const selection = await window.showQuickPick(files);
+
     if (!selection) {
       return;
     }
 
     const filePath = path.join(Config.projectScratchpadsPath, selection);
     fs.unlinkSync(filePath);
-
     window.showInformationMessage(`Scratchpads: Removed ${selection}`);
+  }
+
+  /**
+   * Open a specific scratchpad file by filename
+   */
+  public async openScratchpadByName(fileName: string) {
+    const filePath = path.join(Config.projectScratchpadsPath, fileName);
+    if (fs.existsSync(filePath)) {
+      const doc = await vscode.workspace.openTextDocument(filePath);
+      window.showTextDocument(doc, vscode.ViewColumn.One, false);
+    } else {
+      window.showErrorMessage(`Scratchpads: File ${fileName} not found`);
+    }
+  }
+
+  /**
+   * Rename a specific scratchpad file by filename
+   */
+  public async renameScratchpadByName(fileName: string) {
+    const currentFilePath = path.join(Config.projectScratchpadsPath, fileName);
+    
+    if (!fs.existsSync(currentFilePath)) {
+      window.showErrorMessage(`Scratchpads: File ${fileName} not found`);
+      return;
+    }
+
+    const currentFileExt = path.extname(fileName);
+    const currentBaseName = path.basename(fileName, currentFileExt);
+    const renameWithExt = Config.getExtensionConfiguration(CONFIG_RENAME_WITH_EXTENSION);
+
+    const inputValue = renameWithExt ? fileName : currentBaseName;
+
+    const newFileName = await window.showInputBox({
+      placeHolder: 'Enter new filename:',
+      value: inputValue,
+    });
+
+    if (!newFileName) {
+      return;
+    }
+
+    // Determine the final path based on whether extension renaming is allowed
+    const finalFileName = renameWithExt ? newFileName : `${newFileName}${currentFileExt}`;
+    const newFilePath = path.join(Config.projectScratchpadsPath, finalFileName);
+
+    // Check if target file already exists
+    if (fs.existsSync(newFilePath)) {
+      window.showErrorMessage('Scratchpads: A file with that name already exists');
+      return;
+    }
+
+    try {
+      // Check if file is currently open and close it
+      const openEditors = vscode.window.visibleTextEditors;
+      const openEditor = openEditors.find(editor => editor.document.fileName === currentFilePath);
+      
+      if (openEditor) {
+        await openEditor.document.save();
+        await vscode.window.showTextDocument(openEditor.document, openEditor.viewColumn);
+        await vscode.commands.executeCommand('workbench.action.closeActiveEditor');
+      }
+
+      fs.renameSync(currentFilePath, newFilePath);
+
+      // Reopen the renamed file if it was previously open
+      if (openEditor) {
+        const doc = await vscode.workspace.openTextDocument(newFilePath);
+        window.showTextDocument(doc, openEditor.viewColumn);
+      }
+
+      window.showInformationMessage(`Scratchpads: Renamed to ${finalFileName}`);
+    } catch (error) {
+      window.showErrorMessage(`Scratchpads: Failed to rename file: ${error}`);
+    }
+  }
+
+  /**
+   * Remove a specific scratchpad file by filename
+   */
+  public async removeScratchpadByName(fileName: string) {
+    const filePath = path.join(Config.projectScratchpadsPath, fileName);
+    
+    if (!fs.existsSync(filePath)) {
+      window.showErrorMessage(`Scratchpads: File ${fileName} not found`);
+      return;
+    }
+
+    // Ask for confirmation
+    const confirmation = await window.showWarningMessage(
+      `Are you sure you want to delete "${fileName}"?`,
+      { modal: true },
+      'Delete'
+    );
+
+    if (confirmation !== 'Delete') {
+      return;
+    }
+
+    try {
+      // Check if file is currently open and close it
+      const openEditors = vscode.window.visibleTextEditors;
+      const openEditor = openEditors.find(editor => editor.document.fileName === filePath);
+      
+      if (openEditor) {
+        await vscode.window.showTextDocument(openEditor.document, openEditor.viewColumn);
+        await vscode.commands.executeCommand('workbench.action.closeActiveEditor');
+      }
+
+      fs.unlinkSync(filePath);
+      window.showInformationMessage(`Scratchpads: Removed ${fileName}`);
+    } catch (error) {
+      window.showErrorMessage(`Scratchpads: Failed to remove file: ${error}`);
+    }
   }
 
   /**
