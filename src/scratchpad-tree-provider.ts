@@ -37,7 +37,8 @@ export class ScratchpadTreeProvider implements vscode.TreeDataProvider<string> {
     const filePath = Utils.getScratchpadFilePath(element);
     const treeItem = new vscode.TreeItem(element, vscode.TreeItemCollapsibleState.None);
 
-    // Set file icon based on extension - VSCode will automatically choose the right icon
+    // Use resourceUri to get proper file icons (blue TS, yellow JSON, etc.)
+    // This gives us the beautiful, colorful file icons from VSCode themes
     treeItem.resourceUri = vscode.Uri.file(filePath);
 
     // Add command to open file on click
@@ -67,5 +68,21 @@ export class ScratchpadTreeProvider implements vscode.TreeDataProvider<string> {
       console.error('Scratchpads: Error reading directory:', error);
       return Promise.resolve([]);
     }
+  }
+
+  /**
+   * Rename a scratchpad file from the tree view (STUB)
+   * @param fileName The filename to rename
+   */
+  public async renameFile(fileName: string): Promise<void> {
+    vscode.window.showInformationMessage(`Rename clicked: ${fileName}`);
+  }
+
+  /**
+   * Delete a scratchpad file from the tree view (STUB)
+   * @param fileName The filename to delete
+   */
+  public async deleteFile(fileName: string): Promise<void> {
+    vscode.window.showInformationMessage(`Delete clicked: ${fileName}`);
   }
 }
