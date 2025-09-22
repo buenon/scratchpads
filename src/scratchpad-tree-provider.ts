@@ -8,9 +8,25 @@ export class ScratchpadTreeProvider implements vscode.TreeDataProvider<string> {
     string | undefined | null | void
   >();
   readonly onDidChangeTreeData: vscode.Event<string | undefined | null | void> = this._onDidChangeTreeData.event;
+  private fileWatcher: vscode.FileSystemWatcher | undefined;
 
   constructor() {
-    // Empty constructor for now
+    this.setupFileWatcher();
+  }
+
+  private setupFileWatcher(): void {
+    // Watch the scratchpads directory for changes
+    const watchPattern = new vscode.RelativePattern(Config.projectScratchpadsPath, '*');
+    this.fileWatcher = vscode.workspace.createFileSystemWatcher(watchPattern);
+
+    // Refresh tree on file create, delete, or change
+    this.fileWatcher.onDidCreate(() => this.refresh());
+    this.fileWatcher.onDidDelete(() => this.refresh());
+    this.fileWatcher.onDidChange(() => this.refresh());
+  }
+
+  dispose(): void {
+    this.fileWatcher?.dispose();
   }
 
   refresh(): void {
