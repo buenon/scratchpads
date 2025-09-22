@@ -1,4 +1,5 @@
 import * as fs from 'fs';
+import * as path from 'path';
 import * as vscode from 'vscode';
 import { Config } from './config';
 
@@ -17,8 +18,23 @@ export class ScratchpadTreeProvider implements vscode.TreeDataProvider<string> {
   }
 
   getTreeItem(element: string): vscode.TreeItem {
-    // This will be implemented in the next task
-    return new vscode.TreeItem(element, vscode.TreeItemCollapsibleState.None);
+    const filePath = path.join(Config.projectScratchpadsPath, element);
+    const treeItem = new vscode.TreeItem(element, vscode.TreeItemCollapsibleState.None);
+
+    // Set file icon based on extension - VSCode will automatically choose the right icon
+    treeItem.resourceUri = vscode.Uri.file(filePath);
+
+    // Add command to open file on click
+    treeItem.command = {
+      command: 'vscode.open',
+      title: 'Open File',
+      arguments: [vscode.Uri.file(filePath)],
+    };
+
+    // Set context value for inline action buttons (rename/delete)
+    treeItem.contextValue = 'scratchpadFile';
+
+    return treeItem;
   }
 
   getChildren(element?: string): Thenable<string[]> {
