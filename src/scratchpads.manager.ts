@@ -53,13 +53,13 @@ export class ScratchpadsManager {
       }
 
       let finalFilename = `${baseFilename}${filetype.ext}`;
-      let fullPath = path.join(Config.projectScratchpadsPath, finalFilename);
+      let fullPath = Utils.getScratchpadFilePath(finalFilename);
 
       // Find an available filename
       while (fs.existsSync(fullPath)) {
         i = i + 1;
         finalFilename = `${baseFilename}${i}${filetype.ext}`;
-        fullPath = path.join(Config.projectScratchpadsPath, finalFilename);
+        fullPath = Utils.getScratchpadFilePath(finalFilename);
       }
 
       const isAutoPaste = Config.getExtensionConfiguration(CONFIG_AUTO_PASTE);
@@ -101,7 +101,7 @@ export class ScratchpadsManager {
    * Re-open a scratchpad file
    */
   public async openScratchpad() {
-    const files = fs.readdirSync(Config.projectScratchpadsPath);
+    const files = Utils.getScratchpadFiles();
 
     if (!files.length) {
       window.showInformationMessage('Scratchpads: No scratchpads to open');
@@ -113,11 +113,10 @@ export class ScratchpadsManager {
       return;
     }
 
-    const filePath = path.join(Config.projectScratchpadsPath, selection);
+    const filePath = Utils.getScratchpadFilePath(selection);
 
     if (fs.existsSync(filePath)) {
-      const doc = await vscode.workspace.openTextDocument(filePath);
-      vscode.window.showTextDocument(doc, vscode.ViewColumn.One, false);
+      await Utils.openFile(filePath);
     }
   }
 
@@ -127,7 +126,7 @@ export class ScratchpadsManager {
    * Shows error message if no scratchpads exist or if opening fails.
    */
   public async openLatestScratchpad() {
-    const files = fs.readdirSync(Config.projectScratchpadsPath);
+    const files = Utils.getScratchpadFiles();
 
     if (!files.length) {
       window.showInformationMessage('Scratchpads: No scratchpads to open');
@@ -137,7 +136,7 @@ export class ScratchpadsManager {
     try {
       // Get all files with their stats
       const fileStats = files.map((file) => {
-        const filePath = path.join(Config.projectScratchpadsPath, file);
+        const filePath = Utils.getScratchpadFilePath(file);
         return {
           name: file,
           path: filePath,
@@ -150,8 +149,7 @@ export class ScratchpadsManager {
 
       // Open the most recent file
       const latestFile = fileStats[0];
-      const doc = await vscode.workspace.openTextDocument(latestFile.path);
-      await vscode.window.showTextDocument(doc, vscode.ViewColumn.One, false);
+      await Utils.openFile(latestFile.path);
     } catch (error) {
       window.showErrorMessage(`Scratchpads: Failed to open latest scratchpad: ${error}`);
     }
@@ -188,7 +186,7 @@ export class ScratchpadsManager {
     // Determine the final path based on whether extension renaming is allowed
     const finalFileName = renameWithExt ? newFileName : `${newFileName}${currentFileExt}`;
 
-    const newFilePath = path.join(Config.projectScratchpadsPath, finalFileName);
+    const newFilePath = Utils.getScratchpadFilePath(finalFileName);
 
     // Check if target file already exists
     if (fs.existsSync(newFilePath)) {
@@ -217,7 +215,7 @@ export class ScratchpadsManager {
    * Remove a single scratchpad file
    */
   public async removeScratchpad() {
-    const files = fs.readdirSync(Config.projectScratchpadsPath);
+    const files = Utils.getScratchpadFiles();
 
     if (!files.length) {
       window.showInformationMessage('Scratchpads: No scratchpads to delete');
@@ -229,7 +227,7 @@ export class ScratchpadsManager {
       return;
     }
 
-    const filePath = path.join(Config.projectScratchpadsPath, selection);
+    const filePath = Utils.getScratchpadFilePath(selection);
     fs.unlinkSync(filePath);
 
     window.showInformationMessage(`Scratchpads: Removed ${selection}`);

@@ -1,7 +1,7 @@
-import * as fs from 'fs';
-import * as path from 'path';
 import * as vscode from 'vscode';
 import { Config } from './config';
+import { ScratchpadsManager } from './scratchpads.manager';
+import Utils from './utils';
 
 export class ScratchpadTreeProvider implements vscode.TreeDataProvider<string> {
   private _onDidChangeTreeData: vscode.EventEmitter<string | undefined | null | void> = new vscode.EventEmitter<
@@ -10,7 +10,7 @@ export class ScratchpadTreeProvider implements vscode.TreeDataProvider<string> {
   readonly onDidChangeTreeData: vscode.Event<string | undefined | null | void> = this._onDidChangeTreeData.event;
   private fileWatcher: vscode.FileSystemWatcher | undefined;
 
-  constructor() {
+  constructor(private scratchpadsManager?: ScratchpadsManager) {
     this.setupFileWatcher();
   }
 
@@ -34,7 +34,7 @@ export class ScratchpadTreeProvider implements vscode.TreeDataProvider<string> {
   }
 
   getTreeItem(element: string): vscode.TreeItem {
-    const filePath = path.join(Config.projectScratchpadsPath, element);
+    const filePath = Utils.getScratchpadFilePath(element);
     const treeItem = new vscode.TreeItem(element, vscode.TreeItemCollapsibleState.None);
 
     // Set file icon based on extension - VSCode will automatically choose the right icon
@@ -60,13 +60,8 @@ export class ScratchpadTreeProvider implements vscode.TreeDataProvider<string> {
     }
 
     try {
-      // Check if scratchpads directory exists
-      if (!fs.existsSync(Config.projectScratchpadsPath)) {
-        return Promise.resolve([]);
-      }
-
-      // Read files from scratchpad directory (same pattern as ScratchpadsManager.openScratchpad)
-      const files = fs.readdirSync(Config.projectScratchpadsPath);
+      // Use Utils helper to get files
+      const files = Utils.getScratchpadFiles();
       return Promise.resolve(files);
     } catch (error) {
       console.error('Scratchpads: Error reading directory:', error);
