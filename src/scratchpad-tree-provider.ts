@@ -69,50 +69,35 @@ export class ScratchpadTreeProvider implements vscode.TreeDataProvider<string> {
    */
   public async renameFile(fileName: string): Promise<void> {
     const filePath = Utils.getScratchpadFilePath(fileName);
-    const fileExt = path.extname(fileName);
-    const baseName = path.basename(fileName, fileExt);
-    const renameWithExt = Config.getExtensionConfiguration('renameWithExtension');
 
-    const newFileName = await vscode.window.showInputBox({
-      placeHolder: 'Enter new filename:',
-      value: renameWithExt ? fileName : baseName,
-    });
-
+    const newFileName = await Utils.promptForNewFilename(fileName);
     if (!newFileName) {
       return;
     }
 
+    const fileExt = path.extname(fileName);
+    const renameWithExt = Config.getExtensionConfiguration('renameWithExtension');
     const finalFileName = renameWithExt ? newFileName : `${newFileName}${fileExt}`;
     const newFilePath = Utils.getScratchpadFilePath(finalFileName);
 
-    if (fs.existsSync(newFilePath)) {
-      const overwrite = await vscode.window.showWarningMessage(
-        `Scratchpads: A file named "${finalFileName}" already exists.`,
-        'Overwrite',
-        'Cancel',
-      );
-
-      if (overwrite !== 'Overwrite') {
-        return;
-      }
+    const shouldProceed = await Utils.confirmOverwrite(newFilePath, finalFileName);
+    if (!shouldProceed) {
+      return;
     }
 
     try {
-      const openEditor = vscode.window.visibleTextEditors.find((editor) => editor.document.fileName === filePath);
+      const openEditor = Utils.findOpenEditor(filePath);
 
       if (openEditor) {
         // File is open - handle tab management
         await openEditor.document.save();
         await vscode.window.showTextDocument(openEditor.document);
         await Utils.closeActiveEditor();
-
-        await vscode.workspace.fs.rename(vscode.Uri.file(filePath), vscode.Uri.file(newFilePath), { overwrite: true });
-
-        const doc = await vscode.workspace.openTextDocument(newFilePath);
-        vscode.window.showTextDocument(doc);
+        await Utils.renameFile(filePath, newFilePath);
+        await Utils.openFile(newFilePath);
       } else {
         // File not open - simple rename
-        await vscode.workspace.fs.rename(vscode.Uri.file(filePath), vscode.Uri.file(newFilePath), { overwrite: true });
+        await Utils.renameFile(filePath, newFilePath);
       }
 
       vscode.window.showInformationMessage(`Scratchpads: Renamed to ${finalFileName}`);
@@ -128,19 +113,7 @@ export class ScratchpadTreeProvider implements vscode.TreeDataProvider<string> {
     const filePath = Utils.getScratchpadFilePath(fileName);
 
     try {
-      // Close ALL tabs for this file (including background tabs)
-      const fileUri = vscode.Uri.file(filePath);
-
-      // Find all tabs with this file and close them
-      for (const tabGroup of vscode.window.tabGroups.all) {
-        for (const tab of tabGroup.tabs) {
-          if (tab.input instanceof vscode.TabInputText && tab.input.uri.fsPath === filePath) {
-            await vscode.window.tabGroups.close(tab);
-          }
-        }
-      }
-
-      // Delete the file
+      await Utils.closeAllTabsForFile(filePath);
       fs.unlinkSync(filePath);
       vscode.window.showInformationMessage(`Scratchpads: Removed ${fileName}`);
     } catch (error) {

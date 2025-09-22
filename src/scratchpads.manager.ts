@@ -67,11 +67,10 @@ export class ScratchpadsManager {
       const data = isAutoPaste ? await vscode.env.clipboard.readText() : '';
 
       fs.writeFileSync(fullPath, data);
-
-      const doc = await vscode.workspace.openTextDocument(fullPath);
-      window.showTextDocument(doc);
+      await Utils.openFile(fullPath);
 
       if (isAutoPaste && isAutoFormat) {
+        const doc = await vscode.workspace.openTextDocument(fullPath);
         await this.autoFormatDoc(doc);
       }
     }
@@ -168,42 +167,27 @@ export class ScratchpadsManager {
 
     const currentFilePath = activeEditor.document.fileName;
     const currentFileName = path.basename(currentFilePath);
-    const currentFileExt = path.extname(currentFileName);
-    const currentBaseName = path.basename(currentFileName, currentFileExt);
-    const renameWithExt = Config.getExtensionConfiguration(CONFIG_RENAME_WITH_EXTENSION);
 
-    const inputValue = renameWithExt ? currentFileName : currentBaseName;
-
-    const newFileName = await window.showInputBox({
-      placeHolder: 'Enter new filename:',
-      value: inputValue,
-    });
-
+    const newFileName = await Utils.promptForNewFilename(currentFileName);
     if (!newFileName) {
       return;
     }
 
-    // Determine the final path based on whether extension renaming is allowed
-    const finalFileName = renameWithExt ? newFileName : `${newFileName}${currentFileExt}`;
-
+    const fileExt = path.extname(currentFileName);
+    const renameWithExt = Config.getExtensionConfiguration(CONFIG_RENAME_WITH_EXTENSION);
+    const finalFileName = renameWithExt ? newFileName : `${newFileName}${fileExt}`;
     const newFilePath = Utils.getScratchpadFilePath(finalFileName);
 
-    // Check if target file already exists
-    if (fs.existsSync(newFilePath)) {
-      window.showErrorMessage('Scratchpads: A file with that name already exists');
+    const shouldProceed = await Utils.confirmOverwrite(newFilePath, finalFileName);
+    if (!shouldProceed) {
       return;
     }
 
     try {
-      // Close the document first to avoid file lock issues
       await activeEditor.document.save();
       await Utils.closeActiveEditor();
-
-      fs.renameSync(currentFilePath, newFilePath);
-
-      // Reopen the renamed file
-      const doc = await vscode.workspace.openTextDocument(newFilePath);
-      window.showTextDocument(doc);
+      await Utils.renameFile(currentFilePath, newFilePath);
+      await Utils.openFile(newFilePath);
 
       window.showInformationMessage(`Scratchpads: Renamed to ${finalFileName}`);
     } catch (error) {
@@ -359,10 +343,10 @@ export class ScratchpadsManager {
   private deleteScratchpadFiles() {
     console.log('Deleting scratchpad files');
 
-    const files = fs.readdirSync(Config.projectScratchpadsPath);
+    const files = Utils.getScratchpadFiles();
 
-    for (let i = 0, len = files.length; i < len; i++) {
-      fs.unlinkSync(path.join(Config.projectScratchpadsPath, files[i]));
+    for (const file of files) {
+      fs.unlinkSync(Utils.getScratchpadFilePath(file));
     }
 
     window.showInformationMessage('Scratchpads: Removed all scratchpads');

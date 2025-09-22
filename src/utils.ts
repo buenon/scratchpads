@@ -96,4 +96,72 @@ export default class Utils {
     const doc = await vscode.workspace.openTextDocument(filePath);
     vscode.window.showTextDocument(doc);
   }
+
+  /**
+   * Close all tabs for a specific file
+   * @param filePath Full path to the file
+   */
+  public static async closeAllTabsForFile(filePath: string): Promise<void> {
+    for (const tabGroup of vscode.window.tabGroups.all) {
+      for (const tab of tabGroup.tabs) {
+        if (tab.input instanceof vscode.TabInputText && tab.input.uri.fsPath === filePath) {
+          await vscode.window.tabGroups.close(tab);
+        }
+      }
+    }
+  }
+
+  /**
+   * Find if a file is currently open in any editor
+   * @param filePath Full path to the file
+   * @returns The editor if found, undefined otherwise
+   */
+  public static findOpenEditor(filePath: string): vscode.TextEditor | undefined {
+    return vscode.window.visibleTextEditors.find((editor) => editor.document.fileName === filePath);
+  }
+
+  /**
+   * Rename a file using VSCode's file system API
+   * @param oldPath Current file path
+   * @param newPath New file path
+   */
+  public static async renameFile(oldPath: string, newPath: string): Promise<void> {
+    await vscode.workspace.fs.rename(vscode.Uri.file(oldPath), vscode.Uri.file(newPath), { overwrite: true });
+  }
+
+  /**
+   * Show rename input dialog and get new filename
+   * @param currentFileName Current filename
+   * @returns New filename or undefined if cancelled
+   */
+  public static async promptForNewFilename(currentFileName: string): Promise<string | undefined> {
+    const fileExt = path.extname(currentFileName);
+    const baseName = path.basename(currentFileName, fileExt);
+    const renameWithExt = Config.getExtensionConfiguration('renameWithExtension');
+
+    return await vscode.window.showInputBox({
+      placeHolder: 'Enter new filename:',
+      value: renameWithExt ? currentFileName : baseName,
+    });
+  }
+
+  /**
+   * Check if file exists and prompt for overwrite if needed
+   * @param filePath Path to check
+   * @param fileName Display name for the dialog
+   * @returns true if should proceed, false if cancelled
+   */
+  public static async confirmOverwrite(filePath: string, fileName: string): Promise<boolean> {
+    if (!fs.existsSync(filePath)) {
+      return true;
+    }
+
+    const overwrite = await vscode.window.showWarningMessage(
+      `Scratchpads: A file named "${fileName}" already exists.`,
+      'Overwrite',
+      'Cancel',
+    );
+
+    return overwrite === 'Overwrite';
+  }
 }
