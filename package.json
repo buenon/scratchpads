@@ -124,6 +124,16 @@
         "command": "scratchpads.tree.delete",
         "title": "Delete",
         "icon": "$(trash)"
+      },
+      {
+        "command": "scratchpads.tree.new",
+        "title": "New Scratchpad",
+        "icon": "$(add)"
+      },
+      {
+        "command": "scratchpads.tree.removeAll",
+        "title": "Remove All Scratchpads",
+        "icon": "$(trash)"
       }
     ],
     "menus": {
@@ -139,6 +149,18 @@
           "group": "inline"
         }
       ],
+      "view/title": [
+        {
+          "command": "scratchpads.tree.new",
+          "when": "view == scratchpads",
+          "group": "navigation"
+        },
+        {
+          "command": "scratchpads.tree.removeAll",
+          "when": "view == scratchpads",
+          "group": "navigation"
+        }
+      ],
       "commandPalette": [
         {
           "command": "scratchpads.tree.rename",
@@ -146,6 +168,14 @@
         },
         {
           "command": "scratchpads.tree.delete",
+          "when": "false"
+        },
+        {
+          "command": "scratchpads.tree.new",
+          "when": "false"
+        },
+        {
+          "command": "scratchpads.tree.removeAll",
           "when": "false"
         }
       ]

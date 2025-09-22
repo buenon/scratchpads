@@ -37,6 +37,8 @@ export function activate(context: vscode.ExtensionContext) {
     'scratchpads.newFiletype': () => Utils.confirmFolder() && scratchpadsManager.newFiletype(),
     'scratchpads.tree.rename': (fileName: string) => Utils.confirmFolder() && treeViewProvider.renameFile(fileName),
     'scratchpads.tree.delete': (fileName: string) => Utils.confirmFolder() && treeViewProvider.deleteFile(fileName),
+    'scratchpads.tree.new': () => Utils.confirmFolder() && scratchpadsManager.createScratchpad(),
+    'scratchpads.tree.removeAll': () => Utils.confirmFolder() && scratchpadsManager.removeAllScratchpads(),
   };
 
   for (const command in commands) {
