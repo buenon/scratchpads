@@ -1,25 +1,22 @@
+import * as fs from 'fs';
+import * as path from 'path';
 import * as vscode from 'vscode';
 import { Config } from './config';
-import { ScratchpadsManager } from './scratchpads.manager';
 import Utils from './utils';
 
 export class ScratchpadTreeProvider implements vscode.TreeDataProvider<string> {
-  private _onDidChangeTreeData: vscode.EventEmitter<string | undefined | null | void> = new vscode.EventEmitter<
-    string | undefined | null | void
-  >();
-  readonly onDidChangeTreeData: vscode.Event<string | undefined | null | void> = this._onDidChangeTreeData.event;
+  private _onDidChangeTreeData = new vscode.EventEmitter<string | undefined | null | void>();
+  readonly onDidChangeTreeData = this._onDidChangeTreeData.event;
   private fileWatcher: vscode.FileSystemWatcher | undefined;
 
-  constructor(private scratchpadsManager?: ScratchpadsManager) {
+  constructor() {
     this.setupFileWatcher();
   }
 
   private setupFileWatcher(): void {
-    // Watch the scratchpads directory for changes
     const watchPattern = new vscode.RelativePattern(Config.projectScratchpadsPath, '*');
     this.fileWatcher = vscode.workspace.createFileSystemWatcher(watchPattern);
 
-    // Refresh tree on file create, delete, or change
     this.fileWatcher.onDidCreate(() => this.refresh());
     this.fileWatcher.onDidDelete(() => this.refresh());
     this.fileWatcher.onDidChange(() => this.refresh());
@@ -37,31 +34,28 @@ export class ScratchpadTreeProvider implements vscode.TreeDataProvider<string> {
     const filePath = Utils.getScratchpadFilePath(element);
     const treeItem = new vscode.TreeItem(element, vscode.TreeItemCollapsibleState.None);
 
-    // Use resourceUri to get proper file icons (blue TS, yellow JSON, etc.)
-    // This gives us the beautiful, colorful file icons from VSCode themes
+    // Use resourceUri for beautiful theme-based file icons
     treeItem.resourceUri = vscode.Uri.file(filePath);
 
-    // Add command to open file on click
+    // Open file on click
     treeItem.command = {
       command: 'vscode.open',
       title: 'Open File',
       arguments: [vscode.Uri.file(filePath)],
     };
 
-    // Set context value for inline action buttons (rename/delete)
+    // Enable inline action buttons
     treeItem.contextValue = 'scratchpadFile';
 
     return treeItem;
   }
 
   getChildren(element?: string): Thenable<string[]> {
-    // Return empty array for non-root elements (we only have files at root level)
     if (element) {
       return Promise.resolve([]);
     }
 
     try {
-      // Use Utils helper to get files
       const files = Utils.getScratchpadFiles();
       return Promise.resolve(files);
     } catch (error) {
@@ -71,18 +65,86 @@ export class ScratchpadTreeProvider implements vscode.TreeDataProvider<string> {
   }
 
   /**
-   * Rename a scratchpad file from the tree view (STUB)
-   * @param fileName The filename to rename
+   * Rename a scratchpad file
    */
   public async renameFile(fileName: string): Promise<void> {
-    vscode.window.showInformationMessage(`Rename clicked: ${fileName}`);
+    const filePath = Utils.getScratchpadFilePath(fileName);
+    const fileExt = path.extname(fileName);
+    const baseName = path.basename(fileName, fileExt);
+    const renameWithExt = Config.getExtensionConfiguration('renameWithExtension');
+
+    const newFileName = await vscode.window.showInputBox({
+      placeHolder: 'Enter new filename:',
+      value: renameWithExt ? fileName : baseName,
+    });
+
+    if (!newFileName) {
+      return;
+    }
+
+    const finalFileName = renameWithExt ? newFileName : `${newFileName}${fileExt}`;
+    const newFilePath = Utils.getScratchpadFilePath(finalFileName);
+
+    if (fs.existsSync(newFilePath)) {
+      const overwrite = await vscode.window.showWarningMessage(
+        `Scratchpads: A file named "${finalFileName}" already exists.`,
+        'Overwrite',
+        'Cancel',
+      );
+
+      if (overwrite !== 'Overwrite') {
+        return;
+      }
+    }
+
+    try {
+      const openEditor = vscode.window.visibleTextEditors.find((editor) => editor.document.fileName === filePath);
+
+      if (openEditor) {
+        // File is open - handle tab management
+        await openEditor.document.save();
+        await vscode.window.showTextDocument(openEditor.document);
+        await Utils.closeActiveEditor();
+
+        await vscode.workspace.fs.rename(vscode.Uri.file(filePath), vscode.Uri.file(newFilePath), { overwrite: true });
+
+        const doc = await vscode.workspace.openTextDocument(newFilePath);
+        vscode.window.showTextDocument(doc);
+      } else {
+        // File not open - simple rename
+        await vscode.workspace.fs.rename(vscode.Uri.file(filePath), vscode.Uri.file(newFilePath), { overwrite: true });
+      }
+
+      vscode.window.showInformationMessage(`Scratchpads: Renamed to ${finalFileName}`);
+    } catch (error) {
+      vscode.window.showErrorMessage(`Scratchpads: Failed to rename file: ${error}`);
+    }
   }
 
   /**
-   * Delete a scratchpad file from the tree view (STUB)
-   * @param fileName The filename to delete
+   * Delete a scratchpad file
    */
   public async deleteFile(fileName: string): Promise<void> {
-    vscode.window.showInformationMessage(`Delete clicked: ${fileName}`);
+    const filePath = Utils.getScratchpadFilePath(fileName);
+
+    try {
+      // Close ALL tabs for this file (including background tabs)
+      const fileUri = vscode.Uri.file(filePath);
+
+      // Find all tabs with this file and close them
+      for (const tabGroup of vscode.window.tabGroups.all) {
+        for (const tab of tabGroup.tabs) {
+          if (tab.input instanceof vscode.TabInputText && tab.input.uri.fsPath === filePath) {
+            await vscode.window.tabGroups.close(tab);
+          }
+        }
+      }
+
+      // Delete the file
+      fs.unlinkSync(filePath);
+      vscode.window.showInformationMessage(`Scratchpads: Removed ${fileName}`);
+    } catch (error) {
+      vscode.window.showErrorMessage(`Scratchpads: Failed to delete file: ${error}`);
+    }
   }
 }

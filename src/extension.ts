@@ -17,8 +17,8 @@ export function activate(context: vscode.ExtensionContext) {
 
   const scratchpadsManager = new ScratchpadsManager(new FiletypesManager());
 
-  // Register tree view if enabled
-  const treeViewProvider = new ScratchpadTreeProvider(scratchpadsManager);
+  // Register tree view
+  const treeViewProvider = new ScratchpadTreeProvider();
   const treeView = vscode.window.createTreeView('scratchpads', {
     treeDataProvider: treeViewProvider,
     showCollapseAll: false,
