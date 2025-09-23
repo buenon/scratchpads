@@ -14,6 +14,9 @@ export class ScratchpadTreeProvider implements vscode.TreeDataProvider<string> {
   }
 
   private setupFileWatcher(): void {
+    // Dispose existing watcher if it exists
+    this.fileWatcher?.dispose();
+
     const watchPattern = new vscode.RelativePattern(Config.projectScratchpadsPath, '*');
     this.fileWatcher = vscode.workspace.createFileSystemWatcher(watchPattern);
 
@@ -24,6 +27,14 @@ export class ScratchpadTreeProvider implements vscode.TreeDataProvider<string> {
 
   dispose(): void {
     this.fileWatcher?.dispose();
+  }
+
+  /**
+   * Refresh the tree view and update the file watcher when configuration changes
+   */
+  public refreshOnConfigChange(): void {
+    this.setupFileWatcher();
+    this.refresh();
   }
 
   refresh(): void {

@@ -1,7 +1,13 @@
 import * as path from 'path';
 import { Md5 } from 'ts-md5';
 import * as vscode from 'vscode';
-import { CONFIG_SCRATCHPADS_FOLDER, CONFIG_USE_SUBFOLDERS, RECENT_FILETYPES_FILE, SCRATCHPADS_FOLDER_NAME } from './consts';
+import {
+  CONFIG_SCRATCHPADS_FOLDER,
+  CONFIG_USE_SUBFOLDERS,
+  GLOBAL_SCRATCHPADS_FOLDER_NAME,
+  RECENT_FILETYPES_FILE,
+  SCRATCHPADS_FOLDER_NAME,
+} from './consts';
 
 export class Config {
   public static context: vscode.ExtensionContext;
@@ -37,14 +43,14 @@ export class Config {
     const useSubfolders = this.getExtensionConfiguration(CONFIG_USE_SUBFOLDERS) as boolean;
 
     this.scratchpadsRootPath = path.join(this.customPath || this.globalPath, SCRATCHPADS_FOLDER_NAME);
-    
+
     // Use subfolders by default (true) unless explicitly disabled
     if (useSubfolders !== false) {
       this.projectScratchpadsPath = path.join(this.scratchpadsRootPath, this.projectPathMD5);
     } else {
-      this.projectScratchpadsPath = this.scratchpadsRootPath;
+      this.projectScratchpadsPath = path.join(this.scratchpadsRootPath, GLOBAL_SCRATCHPADS_FOLDER_NAME);
     }
-    
+
     this.recentFiletypesFilePath = path.join(this.scratchpadsRootPath, RECENT_FILETYPES_FILE);
   }
 
@@ -56,15 +62,15 @@ export class Config {
    */
   public static getExtensionConfiguration(key: string) {
     const config = this.extensionConfig.inspect(key);
-    
+
     if (config?.workspaceValue !== undefined) {
       return config.workspaceValue;
     }
-    
+
     if (config?.globalValue !== undefined) {
       return config.globalValue;
     }
-    
+
     return config?.defaultValue;
   }
 
@@ -75,7 +81,11 @@ export class Config {
    * @param target Configuration target (defaults to Global)
    * @returns Promise that resolves when the configuration is updated
    */
-  public static async setExtensionConfiguration(key: string, value: any, target: vscode.ConfigurationTarget = vscode.ConfigurationTarget.Global): Promise<void> {
+  public static async setExtensionConfiguration(
+    key: string,
+    value: any,
+    target: vscode.ConfigurationTarget = vscode.ConfigurationTarget.Global,
+  ): Promise<void> {
     await this.extensionConfig.update(key, value, target);
   }
 }

@@ -53,6 +53,8 @@ export function activate(context: vscode.ExtensionContext) {
 
     if (affectedFolder || affectedSubfolders) {
       Config.recalculatePaths();
+      // Refresh the tree view to show files from the new path
+      treeViewProvider.refreshOnConfigChange();
     }
   });
 }

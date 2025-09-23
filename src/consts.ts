@@ -2,6 +2,7 @@ export const ACTIONS_TIMEOUT = 200; // Need to pause a bit when changing or clos
 export const DEFAULT_FILE_PREFIX = 'scratch';
 export const RECENT_FILETYPES_FILE = 'recentFiletypes.json';
 export const SCRATCHPADS_FOLDER_NAME = 'scratchpads';
+export const GLOBAL_SCRATCHPADS_FOLDER_NAME = '__globalScratchpads__';
 
 // Configuration constants
 export const CONFIG_AUTO_FORMAT = 'autoFormat';
