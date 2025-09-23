@@ -78,3 +78,8 @@
   - **Global scratchpads**: All scratchpads are saved in a single shared folder
   - Configuration option: `scratchpads.useSubfolders` (default: true)
   - Thanks to [@h-ahl](https://github.com/h-ahl) for contributing the feature implementation
+
+## 1.2.1
+
+- Added sort actions to treeview
+- Added treeview item description (size and date)
