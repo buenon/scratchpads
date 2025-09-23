@@ -65,8 +65,22 @@
           "type": "string",
           "default": "",
           "description": "The default file extension to use with 'New scratchpad (default)' command (e.g., 'js', 'ts', 'py')"
+        },
+        "scratchpads.showInExplorer": {
+          "type": "boolean",
+          "default": false,
+          "description": "Show scratchpad files in the VSCode Explorer panel"
         }
       }
+    },
+    "views": {
+      "explorer": [
+        {
+          "id": "scratchpads",
+          "name": "SCRATCHPADS",
+          "when": "config.scratchpads.showInExplorer"
+        }
+      ]
     },
     "commands": [
       {
@@ -100,6 +114,90 @@
       {
         "command": "scratchpads.newFiletype",
         "title": "Scratchpads: New filetype"
+      },
+      {
+        "command": "scratchpads.tree.rename",
+        "title": "Rename",
+        "icon": "$(edit)"
+      },
+      {
+        "command": "scratchpads.tree.delete",
+        "title": "Delete",
+        "icon": "$(trash)"
+      },
+      {
+        "command": "scratchpads.tree.new",
+        "title": "New Scratchpad",
+        "icon": "$(add)"
+      },
+      {
+        "command": "scratchpads.tree.removeAll",
+        "title": "Remove All Scratchpads",
+        "icon": "$(trash)"
+      },
+      {
+        "command": "scratchpads.tree.newDefault",
+        "title": "New Default Scratchpad",
+        "icon": "$(zap)"
+      }
+    ],
+    "menus": {
+      "view/item/context": [
+        {
+          "command": "scratchpads.tree.rename",
+          "when": "viewItem == scratchpadFile",
+          "group": "inline"
+        },
+        {
+          "command": "scratchpads.tree.delete",
+          "when": "viewItem == scratchpadFile",
+          "group": "inline"
+        }
+      ],
+      "view/title": [
+        {
+          "command": "scratchpads.tree.new",
+          "when": "view == scratchpads",
+          "group": "navigation"
+        },
+        {
+          "command": "scratchpads.tree.newDefault",
+          "when": "view == scratchpads",
+          "group": "navigation"
+        },
+        {
+          "command": "scratchpads.tree.removeAll",
+          "when": "view == scratchpads",
+          "group": "navigation"
+        }
+      ],
+      "commandPalette": [
+        {
+          "command": "scratchpads.tree.rename",
+          "when": "false"
+        },
+        {
+          "command": "scratchpads.tree.delete",
+          "when": "false"
+        },
+        {
+          "command": "scratchpads.tree.new",
+          "when": "false"
+        },
+        {
+          "command": "scratchpads.tree.removeAll",
+          "when": "false"
+        },
+        {
+          "command": "scratchpads.tree.newDefault",
+          "when": "false"
+        }
+      ]
+    },
+    "viewsWelcome": [
+      {
+        "view": "scratchpads",
+        "contents": "No scratchpads yet.\nCreate your first scratchpad and start doodling!\n\n[Create New Scratchpad](command:scratchpads.newScratchpad)"
       }
     ]
   },
