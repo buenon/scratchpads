@@ -298,42 +298,21 @@ export class ScratchpadsManager {
   }
 
   /**
-   * Closes all open scratchpad tabs.
-   * Uses a circular iteration strategy since VSCode doesn't provide direct tab access:
-   * 1. Starts from active editor
-   * 2. Cycles through all tabs
-   * 3. Closes scratchpad tabs until returning to starting point
+   * Closes all open scratchpad tabs
    */
   private async closeTabs() {
-    let initial = window.activeTextEditor;
-    let curr;
+    const scratchpadFiles = Utils.getScratchpadFiles();
+    const scratchpadPaths = scratchpadFiles.map((file) => Utils.getScratchpadFilePath(file));
 
-    while (initial && this.isScratchpadEditor(initial)) {
-      // Started with a scratchpad tab
-      // Close tab until it is not longer a scratchpad tab
-      console.log('initial is a scratchpad: ' + initial.document.fileName);
-
-      await Utils.closeActiveEditor();
-      initial = window.activeTextEditor;
-    }
-
-    if (initial) {
-      console.log('initial editor: ' + initial.document.fileName);
-
-      while (initial.document !== curr?.document) {
-        // Iterate over open tabs and close scratchpad tabs until we're back to the initial tab
-        if (this.isScratchpadEditor(window.activeTextEditor)) {
-          await Utils.closeActiveEditor();
+    for (const tabGroup of vscode.window.tabGroups.all) {
+      for (const tab of tabGroup.tabs) {
+        if (tab.input instanceof vscode.TabInputText) {
+          const tabPath = tab.input.uri.fsPath;
+          if (scratchpadPaths.includes(tabPath)) {
+            await vscode.window.tabGroups.close(tab);
+          }
         }
-
-        await Utils.nextEditor();
-
-        curr = window.activeTextEditor;
       }
-
-      console.log('Back to initial tab. Stopping operation...');
-    } else {
-      console.log('No open tabs');
     }
   }
 
