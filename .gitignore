@@ -3,3 +3,4 @@ node_modules
 *.vsix
 scratchpads
 dist
+.ai
