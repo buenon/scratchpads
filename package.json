@@ -134,6 +134,11 @@
         "command": "scratchpads.tree.removeAll",
         "title": "Remove All Scratchpads",
         "icon": "$(trash)"
+      },
+      {
+        "command": "scratchpads.tree.newDefault",
+        "title": "New Default Scratchpad",
+        "icon": "$(zap)"
       }
     ],
     "menus": {
@@ -152,6 +157,11 @@
       "view/title": [
         {
           "command": "scratchpads.tree.new",
+          "when": "view == scratchpads",
+          "group": "navigation"
+        },
+        {
+          "command": "scratchpads.tree.newDefault",
           "when": "view == scratchpads",
           "group": "navigation"
         },
@@ -176,6 +186,10 @@
         },
         {
           "command": "scratchpads.tree.removeAll",
+          "when": "false"
+        },
+        {
+          "command": "scratchpads.tree.newDefault",
           "when": "false"
         }
       ]
