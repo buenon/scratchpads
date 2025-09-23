@@ -4,10 +4,13 @@ import * as vscode from 'vscode';
 import { Config } from './config';
 import Utils from './utils';
 
+type SortType = 'name' | 'date' | 'type';
+
 export class ScratchpadTreeProvider implements vscode.TreeDataProvider<string> {
   private _onDidChangeTreeData = new vscode.EventEmitter<string | undefined | null | void>();
   readonly onDidChangeTreeData = this._onDidChangeTreeData.event;
   private fileWatcher: vscode.FileSystemWatcher | undefined;
+  private sortBy: SortType = 'name';
 
   constructor() {
     this.setupFileWatcher();
@@ -68,11 +71,58 @@ export class ScratchpadTreeProvider implements vscode.TreeDataProvider<string> {
 
     try {
       const files = Utils.getScratchpadFiles();
-      return Promise.resolve(files);
+      const sortedFiles = this.sortFiles(files);
+      return Promise.resolve(sortedFiles);
     } catch (error) {
       console.error('Scratchpads: Error reading directory:', error);
       return Promise.resolve([]);
     }
+  }
+
+  private sortFiles(files: string[]): string[] {
+    switch (this.sortBy) {
+      case 'name':
+        return files.sort((a, b) => a.localeCompare(b));
+
+      case 'date':
+        return files.sort((a, b) => {
+          const pathA = Utils.getScratchpadFilePath(a);
+          const pathB = Utils.getScratchpadFilePath(b);
+          const statA = fs.statSync(pathA);
+          const statB = fs.statSync(pathB);
+          return statB.mtime.getTime() - statA.mtime.getTime(); // Newest first
+        });
+
+      case 'type':
+        return files.sort((a, b) => {
+          const extA = path.extname(a);
+          const extB = path.extname(b);
+          if (extA === extB) {
+            return a.localeCompare(b); // Same extension, sort by name
+          }
+          return extA.localeCompare(extB);
+        });
+
+      default:
+        return files;
+    }
+  }
+
+  public setSortBy(sortType: SortType): void {
+    this.sortBy = sortType;
+    this.refresh();
+  }
+
+  public sortByName(): void {
+    this.setSortBy('name');
+  }
+
+  public sortByDate(): void {
+    this.setSortBy('date');
+  }
+
+  public sortByType(): void {
+    this.setSortBy('type');
   }
 
   /**
