@@ -3,47 +3,56 @@
 Create multiple scratchpad files for doodling while you're coding.
 
 | NOTE: Version 1.0.0 and above, please review the changelog for breaking changes before upgrading |
-|-----------------------------------------------------------------------------------------|
+| ------------------------------------------------------------------------------------------------ |
 
 ## Highlights
 
-* Create multiple scratchpads
-* Create scratchpads of different languages and file types (based on https://github.com/blakeembrey/language-map)
-* Enjoy VSCode intellisense in your scratchpads
-* Scratchpads are not interfering with your project / source control and can be removed at any time
+- Create multiple scratchpads
+- Create scratchpads of different languages and file types (based on https://github.com/blakeembrey/language-map)
+- Enjoy VSCode intellisense in your scratchpads
+- Scratchpads are not interfering with your project / source control and can be removed at any time
 
 ![Create new Scratchpad](https://raw.githubusercontent.com/buenon/scratchpads/master/images/scratchpad_new.gif)
 
 ## Available Commands
 
-* `Scratchpads: New scratchpad`
-* `Scratchpads: New scratchpad (default)`
-* `Scratchpads: Open scratchpad`
-* `Scratchpads: Rename scratchpad`
-* `Scratchpads: Open latest scratchpad`
-* `Scratchpads: New filetype`
-* `Scratchpads: Remove scratchpad`
-* `Scratchpads: Remove all scratchpads`  
-  *Removing all scratchpad files loops through all the open tabs and closes the scratchpad ones before deleting the
-  files (might seem weird)*
+- `Scratchpads: New scratchpad`
+- `Scratchpads: New scratchpad (default)`
+- `Scratchpads: Open scratchpad`
+- `Scratchpads: Rename scratchpad`
+- `Scratchpads: Open latest scratchpad`
+- `Scratchpads: New filetype`
+- `Scratchpads: Remove scratchpad`
+- `Scratchpads: Remove all scratchpads`
 
 ## Keyboard Shortcuts
 
 You can find instructions on adding shortcuts to the commands above
 on [VSCode website](https://code.visualstudio.com/docs/customization/keybindings).
 
+## Explorer Integration
+
+- **Show in Explorer** - Display scratchpad files directly in the VSCode Explorer panel
+- **File Management** - Rename and delete files using inline buttons (pencil and trash icons)
+- **Quick Actions** - Create new scratchpads and remove all directly from the tree toolbar
+- **Auto-refresh** - Tree updates automatically when files are added, removed, or renamed
+- **Welcome View** - Helpful guidance when no scratchpads exist yet
+
+Enable this feature in Settings: `Scratchpads: Show In Explorer`
+
 ## Extension Settings
 
 Available extension configuration:
 
-* `Auto Format` - Automatically format the new scratchpad content (works only if auto paste is on)
-* `Auto Paste` - Automatically paste clipboard content into the new scratchpad
-* `Default Filetype` - The default file extension to use with 'New scratchpad (default)' command (e.g., 'js', 'ts', 'py')
-* `File Prefix` - The prefix to use when creating new scratchpad files (default: 'scratch')
-* `Prompt For Filename` - Prompt the user for a file name when creating a new scratchpad
-* `Prompt For Removal` - Prompt the user when removing all scratchpads
-* `Scratchpads Folder` - A custom full path in which the scratchpads will be stored (Note: Data will not be moved)
-* `Rename With Extension` - Include the file extension when renaming a scratchpad
+- `Show In Explorer` - Show scratchpad files in the VSCode Explorer panel
+- `Auto Format` - Automatically format the new scratchpad content (works only if auto paste is on)
+- `Auto Paste` - Automatically paste clipboard content into the new scratchpad
+- `Default Filetype` - The default file extension to use with 'New scratchpad (default)' command (e.g., 'js', 'ts', 'py')
+- `File Prefix` - The prefix to use when creating new scratchpad files (default: 'scratch')
+- `Prompt For Filename` - Prompt the user for a file name when creating a new scratchpad
+- `Prompt For Removal` - Prompt the user when removing all scratchpads
+- `Scratchpads Folder` - A custom full path in which the scratchpads will be stored (Note: Data will not be moved)
+- `Rename With Extension` - Include the file extension when renaming a scratchpad
 
 > **Note**: Some extension features may automatically update these settings (e.g., setting default filetype, disabling removal prompt). These changes are saved to your global (user) settings, not workspace settings.
 
