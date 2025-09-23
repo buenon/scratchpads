@@ -179,7 +179,13 @@
           "when": "false"
         }
       ]
-    }
+    },
+    "viewsWelcome": [
+      {
+        "view": "scratchpads",
+        "contents": "No scratchpads yet.\nCreate your first scratchpad and start doodling!\n\n[Create New Scratchpad](command:scratchpads.newScratchpad)"
+      }
+    ]
   },
   "scripts": {
     "vscode:prepublish": "npm run package",
