@@ -2,7 +2,7 @@
   "name": "scratchpads",
   "displayName": "Scratchpads",
   "description": "Create multiple scratchpad files of different file types",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "publisher": "buenon",
   "author": {
     "name": "Nadav Bueno",
@@ -144,6 +144,21 @@
         "command": "scratchpads.tree.newDefault",
         "title": "New Default Scratchpad",
         "icon": "$(zap)"
+      },
+      {
+        "command": "scratchpads.tree.sortByName",
+        "title": "Sort by Name",
+        "icon": "$(sort-precedence)"
+      },
+      {
+        "command": "scratchpads.tree.sortByDate",
+        "title": "Sort by Date",
+        "icon": "$(calendar)"
+      },
+      {
+        "command": "scratchpads.tree.sortByType",
+        "title": "Sort by Type",
+        "icon": "$(file)"
       }
     ],
     "menus": {
@@ -163,17 +178,32 @@
         {
           "command": "scratchpads.tree.new",
           "when": "view == scratchpads",
-          "group": "navigation"
+          "group": "navigation@1"
         },
         {
           "command": "scratchpads.tree.newDefault",
           "when": "view == scratchpads",
-          "group": "navigation"
+          "group": "navigation@2"
+        },
+        {
+          "command": "scratchpads.tree.sortByName",
+          "when": "view == scratchpads",
+          "group": "navigation@3"
+        },
+        {
+          "command": "scratchpads.tree.sortByDate",
+          "when": "view == scratchpads",
+          "group": "navigation@4"
+        },
+        {
+          "command": "scratchpads.tree.sortByType",
+          "when": "view == scratchpads",
+          "group": "navigation@5"
         },
         {
           "command": "scratchpads.tree.removeAll",
           "when": "view == scratchpads",
-          "group": "navigation"
+          "group": "navigation@6"
         }
       ],
       "commandPalette": [
@@ -195,6 +225,18 @@
         },
         {
           "command": "scratchpads.tree.newDefault",
+          "when": "false"
+        },
+        {
+          "command": "scratchpads.tree.sortByName",
+          "when": "false"
+        },
+        {
+          "command": "scratchpads.tree.sortByDate",
+          "when": "false"
+        },
+        {
+          "command": "scratchpads.tree.sortByType",
           "when": "false"
         }
       ]
