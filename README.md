@@ -6,6 +6,17 @@ A powerful VSCode extension that lets you create temporary files for quick notes
 
 ![Create new Scratchpad](https://raw.githubusercontent.com/buenon/scratchpads/master/images/scratchpad_new.gif)
 
+## 🚨 **Breaking Changes in v2.0.0**
+
+**⚠️ Important**: If you're upgrading from v1.x, please read this carefully:
+
+### **Scratchpads Location Bugfix**
+
+Due to a critical bugfix in how project folders are identified and a change in the default **Global** / **Per project** behavior , your existing scratchpads may not appear in the UI after upgrading.  
+**Don't worry - your files are still safe on disk!**
+
+**Solution**: Use the `Scratchpads: Open scratchpads folder` command to locate and access your existing files and safely move them to their new location.
+
 ## ✨ Features
 
 ### 🚀 **Quick Creation**
@@ -66,12 +77,13 @@ A powerful VSCode extension that lets you create temporary files for quick notes
 
 ### Managing Scratchpads
 
-| Command                               | Description                    | Use Case                               |
-| ------------------------------------- | ------------------------------ | -------------------------------------- |
-| `Scratchpads: Rename scratchpad`      | Rename any scratchpad file     | Better organization and identification |
-| `Scratchpads: Remove scratchpad`      | Delete a specific scratchpad   | Clean up individual files              |
-| `Scratchpads: Remove all scratchpads` | Delete all scratchpads at once | Complete cleanup                       |
-| `Scratchpads: New filetype`           | Add custom file extensions     | Support for new languages or formats   |
+| Command                                | Description                    | Use Case                               |
+| -------------------------------------- | ------------------------------ | -------------------------------------- |
+| `Scratchpads: Rename scratchpad`       | Rename any scratchpad file     | Better organization and identification |
+| `Scratchpads: Remove scratchpad`       | Delete a specific scratchpad   | Clean up individual files              |
+| `Scratchpads: Remove all scratchpads`  | Delete all scratchpads at once | Complete cleanup                       |
+| `Scratchpads: New filetype`            | Add custom file extensions     | Support for new languages or formats   |
+| `Scratchpads: Open scratchpads folder` | Open scratchpads folder        | Access your files directly             |
 
 ### Explorer Panel (Optional)
 

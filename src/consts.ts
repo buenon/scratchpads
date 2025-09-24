@@ -16,3 +16,6 @@ export const CONFIG_SCRATCHPADS_FOLDER = 'scratchpadsFolder';
 export const CONFIG_SHOW_IN_EXPLORER = 'showInExplorer';
 export const CONFIG_USE_SUBFOLDERS = 'useSubfolders';
 export const CONFIG_USE_GLOBAL_FOLDER = 'useGlobalFolder';
+
+// Storage keys
+export const STORAGE_V2_BREAKING_CHANGE_SHOWN = 'v2BreakingChangeShown';

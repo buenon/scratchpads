@@ -8,6 +8,7 @@ import {
   GLOBAL_SCRATCHPADS_FOLDER_NAME,
   RECENT_FILETYPES_FILE,
   SCRATCHPADS_FOLDER_NAME,
+  STORAGE_V2_BREAKING_CHANGE_SHOWN,
 } from './consts';
 
 export class Config {
@@ -32,6 +33,7 @@ export class Config {
     this.globalPath = context.globalStorageUri.fsPath;
     await this.migrateConfig();
     this.recalculatePaths();
+    await this.showV2BreakingChangeNotification();
   }
 
   /**
@@ -132,5 +134,35 @@ export class Config {
     target: vscode.ConfigurationTarget = vscode.ConfigurationTarget.Global,
   ): Promise<void> {
     await this.extensionConfig.update(key, value, target);
+  }
+
+  /**
+   * Shows a one-time notification about v2.0.0 breaking changes
+   */
+  public static async showV2BreakingChangeNotification(): Promise<void> {
+    // Check if notification was already shown
+    const hasShown = this.context.globalState.get(STORAGE_V2_BREAKING_CHANGE_SHOWN, false);
+    if (hasShown) {
+      return;
+    }
+
+    // Show the notification
+    const action = await vscode.window.showWarningMessage(
+      'Scratchpads v2.0.0: Due to a bugfix, your existing scratchpads may not appear in the UI. Your files are safe on disk!',
+      'Open Folder',
+      'Do not show again',
+    );
+
+    if (action === 'Open Folder') {
+      // Import Utils dynamically to avoid circular dependency
+      const { default: Utils } = await import('./utils');
+      await Utils.openScratchpadsFolder();
+
+      // Still mark as shown after opening folder
+      await this.context.globalState.update(STORAGE_V2_BREAKING_CHANGE_SHOWN, true);
+    } else if (action === 'Do not show again') {
+      // Mark as shown so it won't appear again
+      await this.context.globalState.update(STORAGE_V2_BREAKING_CHANGE_SHOWN, true);
+    }
   }
 }
