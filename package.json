@@ -127,6 +127,10 @@
         "title": "Scratchpads: New filetype"
       },
       {
+        "command": "scratchpads.openFolder",
+        "title": "Scratchpads: Open scratchpads folder"
+      },
+      {
         "command": "scratchpads.tree.rename",
         "title": "Rename",
         "icon": "$(edit)"
