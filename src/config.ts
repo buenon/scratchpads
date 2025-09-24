@@ -3,6 +3,7 @@ import { Md5 } from 'ts-md5';
 import * as vscode from 'vscode';
 import {
   CONFIG_SCRATCHPADS_FOLDER,
+  CONFIG_USE_GLOBAL_FOLDER,
   CONFIG_USE_SUBFOLDERS,
   GLOBAL_SCRATCHPADS_FOLDER_NAME,
   RECENT_FILETYPES_FILE,
@@ -25,11 +26,55 @@ export class Config {
    * Sets up global paths and loads extension configuration settings.
    * @param context The VSCode extension context
    */
-  public static init(context: vscode.ExtensionContext) {
+  public static async init(context: vscode.ExtensionContext) {
     this.context = context;
     this.extensionConfig = vscode.workspace.getConfiguration('scratchpads');
     this.globalPath = context.globalStorageUri.fsPath;
+    await this.migrateConfig();
     this.recalculatePaths();
+  }
+
+  /**
+   * Migrates legacy useSubfolders setting to useGlobalFolder during initialization.
+   * Removes the legacy setting after migration.
+   */
+  private static async migrateConfig(): Promise<void> {
+    const legacyConfig = this.extensionConfig.inspect(CONFIG_USE_SUBFOLDERS);
+
+    // Migrate workspace level
+    if (legacyConfig?.workspaceValue !== undefined) {
+      await this.extensionConfig.update(
+        CONFIG_USE_GLOBAL_FOLDER,
+        !legacyConfig.workspaceValue,
+        vscode.ConfigurationTarget.Workspace,
+      );
+      await this.extensionConfig.update(CONFIG_USE_SUBFOLDERS, undefined, vscode.ConfigurationTarget.Workspace);
+    }
+
+    // Migrate global level
+    if (legacyConfig?.globalValue !== undefined) {
+      await this.extensionConfig.update(
+        CONFIG_USE_GLOBAL_FOLDER,
+        !legacyConfig.globalValue,
+        vscode.ConfigurationTarget.Global,
+      );
+      await this.extensionConfig.update(CONFIG_USE_SUBFOLDERS, undefined, vscode.ConfigurationTarget.Global);
+    }
+  }
+
+  /**
+   * Determines whether to use global folder based on workspace and configuration.
+   * @param workspaceFolder The current workspace folder path (undefined if no workspace)
+   * @returns true if should use global folder, false for project-specific folders
+   */
+  private static shouldUseGlobalFolder(workspaceFolder: string | undefined): boolean {
+    // Always use global folder when no workspace is open
+    if (!workspaceFolder) {
+      return true;
+    }
+
+    // Simply use the new configuration (migration already happened at init)
+    return this.getExtensionConfiguration(CONFIG_USE_GLOBAL_FOLDER) as boolean;
   }
 
   /**
@@ -39,16 +84,16 @@ export class Config {
    */
   public static recalculatePaths() {
     const workspaceFolder = vscode.workspace.workspaceFolders?.[0]?.uri?.fsPath;
-    const useSubfolders = this.getExtensionConfiguration(CONFIG_USE_SUBFOLDERS) as boolean;
 
     this.customPath = this.getExtensionConfiguration(CONFIG_SCRATCHPADS_FOLDER) as string;
     this.scratchpadsRootPath = path.join(this.customPath || this.globalPath, SCRATCHPADS_FOLDER_NAME);
     this.projectPathMD5 = workspaceFolder ? Md5.hashStr(workspaceFolder) : '';
 
-    if (useSubfolders !== false && this.projectPathMD5) {
-      this.projectScratchpadsPath = path.join(this.scratchpadsRootPath, this.projectPathMD5);
-    } else {
+    // Use global folder if configured, otherwise use project-specific folders
+    if (this.shouldUseGlobalFolder(workspaceFolder)) {
       this.projectScratchpadsPath = path.join(this.scratchpadsRootPath, GLOBAL_SCRATCHPADS_FOLDER_NAME);
+    } else {
+      this.projectScratchpadsPath = path.join(this.scratchpadsRootPath, this.projectPathMD5);
     }
 
     this.recentFiletypesFilePath = path.join(this.scratchpadsRootPath, RECENT_FILETYPES_FILE);

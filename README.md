@@ -17,8 +17,8 @@ A powerful VSCode extension that lets you create temporary files for quick notes
 
 ### 📁 **Smart Organization**
 
-- **Project-specific folders** (default): Each project gets its own scratchpad folder
-- **Global scratchpads**: Share scratchpads across all projects
+- **Global scratchpads** (default): Share scratchpads across all projects
+- **Project-specific folders**: Each project gets its own scratchpad folder
 - Custom storage location support
 - Automatic folder management
 
@@ -36,6 +36,22 @@ A powerful VSCode extension that lets you create temporary files for quick notes
 - **Auto Format**: Format document content automatically (when auto paste is enabled)
 - **Quick Access**: Open your most recent scratchpad instantly
 - **Bulk Operations**: Remove all scratchpads with one command
+
+## 🎯 Perfect For
+
+- **Quick Prototyping**: Test ideas without creating permanent files
+- **Code Snippets**: Save useful code fragments for later reference
+- **Learning**: Practice new languages and frameworks
+- **Documentation**: Write notes and documentation drafts
+- **Debugging**: Isolate and test specific code sections
+- **Experimentation**: Try different approaches without cluttering your project
+
+## 🚀 Getting Started
+
+1. **Install** the extension from the VSCode marketplace
+2. **Open Command Palette** (`Ctrl+Shift+P` / `Cmd+Shift+P`)
+3. **Type** `Scratchpads: New scratchpad` and press Enter
+4. **Choose** your file type and start coding!
 
 ## 🎮 How to Use
 
@@ -71,7 +87,7 @@ Enable `Scratchpads: Show In Explorer` in settings to:
 | Setting                   | Description                           | Default     | Use When                     |
 | ------------------------- | ------------------------------------- | ----------- | ---------------------------- |
 | **Show In Explorer**      | Display scratchpads in Explorer panel | `false`     | Visual file management       |
-| **Use Subfolders**        | Organize by project vs. global        | `true`      | Better organization          |
+| **Use Global Folder**     | Share scratchpads across all projects | `true`      | Working on multiple projects |
 | **Auto Paste**            | Paste clipboard content automatically | `true`      | Faster workflow              |
 | **Auto Format**           | Format document content automatically | `true`      | Clean, readable code         |
 | **Default Filetype**      | Default extension for quick creation  | `""`        | You prefer one language      |
@@ -81,29 +97,38 @@ Enable `Scratchpads: Show In Explorer` in settings to:
 | **Scratchpads Folder**    | Custom storage location               | Auto        | You want specific location   |
 | **Rename With Extension** | Include extension in rename           | `false`     | You want full control        |
 
-> **⚠️ Important**: Settings related to folder location (`Use Subfolders` and `Scratchpads Folder`) do not automatically migrate existing files. When changing these settings, your existing scratchpads will remain in their current location.
+## 📂 **Folder Organization Explained**
 
-## 🎯 Perfect For
+The extension supports two organization modes:
 
-- **Quick Prototyping**: Test ideas without creating permanent files
-- **Code Snippets**: Save useful code fragments for later reference
-- **Learning**: Practice new languages and frameworks
-- **Documentation**: Write notes and documentation drafts
-- **Debugging**: Isolate and test specific code sections
-- **Experimentation**: Try different approaches without cluttering your project
+### 🌐 **Global Folder Mode** (Default: `useGlobalFolder: true`)
 
-## 🚀 Getting Started
+- **All scratchpads** are stored in a single shared folder
+- **Perfect for**: Working across multiple projects, sharing snippets, quick notes
+- **Location**: `<storage>/scratchpads/__globalScratchpads__/`
 
-1. **Install** the extension from the VSCode marketplace
-2. **Open Command Palette** (`Ctrl+Shift+P` / `Cmd+Shift+P`)
-3. **Type** `Scratchpads: New scratchpad` and press Enter
-4. **Choose** your file type and start coding!
+### 📁 **Project-Specific Mode** (`useGlobalFolder: false`)
 
-### Pro Tips 💡
+- **Each workspace** gets its own dedicated scratchpad folder
+- **Perfect for**: Project-specific notes, keeping work separated
+- **Location**: `<storage>/scratchpads/<project-hash>/`
+
+### 🚫 **No Workspace Open**
+
+When VS Code has no workspace or folder open:
+
+- **Always uses global folder** regardless of configuration
+- Ensures scratchpads are always accessible
+- Perfect for quick notes before opening a project
+
+> **⚠️ Important**: Settings related to folder location (`Use Global Folder` and `Scratchpads Folder`) do not automatically migrate existing files. When changing these settings, your existing scratchpads will remain in their current location.
+
+## Pro Tips 💡
 
 - **Enable Explorer Integration** for visual file management
 - **Set a default filetype** for faster creation
 - **Use Auto Paste** to quickly capture clipboard content
+- **Use Auto Format** along with **Auto Paste** to automatically format the clipboard content
 - **Organize by project** to keep scratchpads separate
 - **Add keyboard shortcuts** for your most-used commands
 

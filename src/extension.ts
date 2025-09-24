@@ -12,8 +12,8 @@ import Utils from './utils';
  * - Configuration change listeners
  * @param context The extension context provided by VSCode
  */
-export function activate(context: vscode.ExtensionContext) {
-  Config.init(context);
+export async function activate(context: vscode.ExtensionContext) {
+  await Config.init(context);
 
   const scratchpadsManager = new ScratchpadsManager(new FiletypesManager());
 
@@ -52,9 +52,9 @@ export function activate(context: vscode.ExtensionContext) {
 
   vscode.workspace.onDidChangeConfiguration((event: vscode.ConfigurationChangeEvent) => {
     const affectedFolder = event.affectsConfiguration('scratchpads.scratchpadsFolder');
-    const affectedSubfolders = event.affectsConfiguration('scratchpads.useSubfolders');
+    const affectedGlobalFolder = event.affectsConfiguration('scratchpads.useGlobalFolder');
 
-    if (affectedFolder || affectedSubfolders) {
+    if (affectedFolder || affectedGlobalFolder) {
       Config.recalculatePaths();
       // Refresh the tree view to show files from the new path
       treeViewProvider.refreshOnConfigChange();

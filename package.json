@@ -74,7 +74,13 @@
         "scratchpads.useSubfolders": {
           "type": "boolean",
           "default": true,
-          "description": "Save scratchpads in project-specific subfolders. When disabled, all scratchpads are saved in a single folder."
+          "description": "⚠️ DEPRECATED: Use 'useGlobalFolder' instead. Save scratchpads in project-specific subfolders. When disabled, all scratchpads are saved in a single folder.",
+          "deprecationMessage": "This setting is deprecated. Use 'scratchpads.useGlobalFolder' instead for clearer configuration."
+        },
+        "scratchpads.useGlobalFolder": {
+          "type": "boolean",
+          "default": true,
+          "description": "Save all scratchpads in a single global folder instead of project-specific subfolders. When enabled, scratchpads are shared across all projects."
         }
       }
     },
