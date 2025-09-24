@@ -60,6 +60,12 @@ export function activate(context: vscode.ExtensionContext) {
       treeViewProvider.refreshOnConfigChange();
     }
   });
+
+  // Handle workspace folder changes
+  vscode.workspace.onDidChangeWorkspaceFolders(() => {
+    Config.recalculatePaths();
+    treeViewProvider.refreshOnConfigChange();
+  });
 }
 
 /**

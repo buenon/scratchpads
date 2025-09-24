@@ -28,24 +28,24 @@ export class Config {
   public static init(context: vscode.ExtensionContext) {
     this.context = context;
     this.extensionConfig = vscode.workspace.getConfiguration('scratchpads');
-    this.projectPathMD5 = Md5.hashStr(vscode.env.appRoot);
     this.globalPath = context.globalStorageUri.fsPath;
     this.recalculatePaths();
   }
 
   /**
    * Recalculates all path variables based on current configuration.
-   * This includes the custom path, scratchpads root path, and project-specific paths.
+   * This includes the project path MD5, custom path, scratchpads root path, and project-specific paths.
    * Called when configuration changes or during initialization.
    */
   public static recalculatePaths() {
-    this.customPath = this.getExtensionConfiguration(CONFIG_SCRATCHPADS_FOLDER) as string;
+    const workspaceFolder = vscode.workspace.workspaceFolders?.[0]?.uri?.fsPath;
     const useSubfolders = this.getExtensionConfiguration(CONFIG_USE_SUBFOLDERS) as boolean;
 
+    this.customPath = this.getExtensionConfiguration(CONFIG_SCRATCHPADS_FOLDER) as string;
     this.scratchpadsRootPath = path.join(this.customPath || this.globalPath, SCRATCHPADS_FOLDER_NAME);
+    this.projectPathMD5 = workspaceFolder ? Md5.hashStr(workspaceFolder) : '';
 
-    // Use subfolders by default (true) unless explicitly disabled
-    if (useSubfolders !== false) {
+    if (useSubfolders !== false && this.projectPathMD5) {
       this.projectScratchpadsPath = path.join(this.scratchpadsRootPath, this.projectPathMD5);
     } else {
       this.projectScratchpadsPath = path.join(this.scratchpadsRootPath, GLOBAL_SCRATCHPADS_FOLDER_NAME);
