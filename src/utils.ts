@@ -89,6 +89,39 @@ export default class Utils {
   }
 
   /**
+   * Opens the scratchpads folder with fallback chain:
+   * 1. Try external file manager
+   * 2. Fallback to new VS Code window
+   * 3. Fallback to message with copy button
+   */
+  public static async openScratchpadsFolder(): Promise<void> {
+    const folderPath = Config.scratchpadsRootPath;
+
+    try {
+      // First attempt: Open in external file manager
+      await vscode.env.openExternal(vscode.Uri.file(folderPath));
+    } catch (externalError) {
+      try {
+        // Second attempt: Open in new VS Code window
+        await vscode.commands.executeCommand('vscode.openFolder', vscode.Uri.file(folderPath), {
+          forceNewWindow: true,
+        });
+      } catch (vscodeError) {
+        // Final fallback: Show message with copy button
+        const action = await vscode.window.showInformationMessage(
+          `Could not open folder automatically. Scratchpads folder: ${folderPath}`,
+          'Copy Path',
+        );
+
+        if (action === 'Copy Path') {
+          await vscode.env.clipboard.writeText(folderPath);
+          vscode.window.showInformationMessage('Path copied to clipboard');
+        }
+      }
+    }
+  }
+
+  /**
    * Open a file in VSCode editor
    * @param filePath Full path to the file
    */
