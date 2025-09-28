@@ -148,7 +148,7 @@ export class Config {
 
     // Show the notification
     const action = await vscode.window.showWarningMessage(
-      'Scratchpads v2.0.0: Due to a bugfix, your existing scratchpads may not appear in the UI. Your files are safe on disk!',
+      'Scratchpads v2.0.0: Due to a bugfix, your existing scratchpads may not appear in the UI. Your files are safe on the disk! Refer to the README for more details.',
       'Open Folder',
       'Do not show again',
     );
