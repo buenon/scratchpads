@@ -4,6 +4,7 @@ import * as vscode from 'vscode';
 import { commands, window } from 'vscode';
 import { Config } from './config';
 import { ACTIONS_TIMEOUT } from './consts';
+import { InputBox } from './input-box';
 
 export default class Utils {
   /**
@@ -172,7 +173,7 @@ export default class Utils {
     const baseName = path.basename(currentFileName, fileExt);
     const renameWithExt = Config.getExtensionConfiguration('renameWithExtension');
 
-    return await vscode.window.showInputBox({
+    return await InputBox.show({
       placeHolder: 'Enter new filename:',
       value: renameWithExt ? currentFileName : baseName,
     });

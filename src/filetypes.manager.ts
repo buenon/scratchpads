@@ -3,6 +3,7 @@ import * as vscode from 'vscode';
 import { window } from 'vscode';
 import { Config } from './config';
 import { CONFIG_DEFAULT_FILETYPE } from './consts';
+import { InputBox } from './input-box';
 
 export interface Filetype {
   name: string;
@@ -50,7 +51,7 @@ export class FiletypesManager {
    * Add a new filetype
    */
   public async newFiletype(): Promise<Filetype | undefined> {
-    const ext = await vscode.window.showInputBox({
+    const ext = await InputBox.show({
       placeHolder: 'Enter file extension',
     });
 
@@ -63,8 +64,9 @@ export class FiletypesManager {
         window.showInformationMessage(`Scratchpads: Extension already exists (${existingFiletype.name})`);
       } else {
         const defaultName = this.normalizeExtension(ext).toUpperCase();
-        const name = await vscode.window.showInputBox({
+        const name = await InputBox.show({
           placeHolder: `Enter filetype's name (Hit enter for '${defaultName}')`,
+          allowSpaces: true,
         });
 
         if (name !== undefined) {
@@ -245,7 +247,7 @@ export class FiletypesManager {
    */
   public getDefaultFiletype(): Filetype | undefined {
     const defaultExt = Config.getExtensionConfiguration(CONFIG_DEFAULT_FILETYPE) as string;
-    
+
     if (!defaultExt) {
       return undefined;
     }

@@ -109,6 +109,17 @@ Enable `Scratchpads: Show In Explorer` in settings to:
 | **Scratchpads Folder**    | Custom storage location               | Auto        | You want specific location   |
 | **Rename With Extension** | Include extension in rename           | `false`     | You want full control        |
 
+## 📝 **Filename Guidelines**
+
+To ensure your scratchpads work correctly across all systems, filenames are automatically filtered to include only safe characters:
+
+### ✅ **Allowed Characters**
+
+- **Letters**: `A-Z`, `a-z`
+- **Numbers**: `0-9`
+- **Symbols**: `_` (underscore), `-` (hyphen), `.` (dot)
+- Leading or trailing dots and spaces are automatically removed
+
 ## 📂 **Folder Organization Explained**
 
 The extension supports two organization modes:
