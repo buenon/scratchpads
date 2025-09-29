@@ -53,9 +53,6 @@ export class ScratchpadsManager {
         }
       }
 
-      // Remove trailing dots to prevent double dots when adding extension
-      baseFilename = baseFilename.replace(/\.+$/, '');
-
       let finalFilename = `${baseFilename}${filetype.ext}`;
       let fullPath = Utils.getScratchpadFilePath(finalFilename);
 

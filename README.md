@@ -118,6 +118,7 @@ To ensure your scratchpads work correctly across all systems, filenames are auto
 - **Letters**: `A-Z`, `a-z`
 - **Numbers**: `0-9`
 - **Symbols**: `_` (underscore), `-` (hyphen), `.` (dot)
+- Leading or trailing dots and spaces are automatically removed
 
 ## 📂 **Folder Organization Explained**
 
