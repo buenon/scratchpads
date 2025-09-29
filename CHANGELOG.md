@@ -91,16 +91,17 @@
 - Default behavior changed: Global shared folder is now the default (was project-specific folders)
 - 🟢 Your files are safe on disk - use the new "Open scratchpads folder" command to locate them
 
+**🐛 BUG FIXES**
+
+- [#67](https://github.com/buenon/scratchpads/issues/67) - Fixed filename validation to prevent invalid characters and subdirectory creation
+- [#69](https://github.com/buenon/scratchpads/issues/69) - Fixed project path calculation to use workspace folder path instead of VS Code installation path
+
 **✨ NEW FEATURES**
 
 - New command: `Scratchpads: Open scratchpads folder` with cross-platform support
+- New command: `Scratchpads: Remove custom filetype` to clean up your custom filetype list
 - One-time popup informs users and helps them locate existing files after upgrade
 - Automatic configuration migration preserves user preferences during setting migration
-
-**🔧 IMPROVEMENTS**
-
-- Improved workspace handling when no workspace is open (always uses global folder)
-- Fixed project path calculation to use workspace folder path instead of VS Code installation path
 
 **📋 CONFIGURATION MIGRATION**
 
