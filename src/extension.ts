@@ -12,8 +12,8 @@ import Utils from './utils';
  * - Configuration change listeners
  * @param context The extension context provided by VSCode
  */
-export function activate(context: vscode.ExtensionContext) {
-  Config.init(context);
+export async function activate(context: vscode.ExtensionContext) {
+  await Config.init(context);
 
   const scratchpadsManager = new ScratchpadsManager(new FiletypesManager());
 
@@ -35,6 +35,8 @@ export function activate(context: vscode.ExtensionContext) {
     'scratchpads.removeAllScratchpads': () => Utils.confirmFolder() && scratchpadsManager.removeAllScratchpads(),
     'scratchpads.removeScratchpad': () => Utils.confirmFolder() && scratchpadsManager.removeScratchpad(),
     'scratchpads.newFiletype': () => Utils.confirmFolder() && scratchpadsManager.newFiletype(),
+    'scratchpads.removeFiletype': () => Utils.confirmFolder() && scratchpadsManager.removeFiletype(),
+    'scratchpads.openFolder': () => Utils.openScratchpadsFolder(),
     'scratchpads.tree.rename': (fileName: string) => Utils.confirmFolder() && treeViewProvider.renameFile(fileName),
     'scratchpads.tree.delete': (fileName: string) => Utils.confirmFolder() && treeViewProvider.deleteFile(fileName),
     'scratchpads.tree.new': () => Utils.confirmFolder() && scratchpadsManager.createScratchpad(),
@@ -52,13 +54,19 @@ export function activate(context: vscode.ExtensionContext) {
 
   vscode.workspace.onDidChangeConfiguration((event: vscode.ConfigurationChangeEvent) => {
     const affectedFolder = event.affectsConfiguration('scratchpads.scratchpadsFolder');
-    const affectedSubfolders = event.affectsConfiguration('scratchpads.useSubfolders');
+    const affectedGlobalFolder = event.affectsConfiguration('scratchpads.useGlobalFolder');
 
-    if (affectedFolder || affectedSubfolders) {
+    if (affectedFolder || affectedGlobalFolder) {
       Config.recalculatePaths();
       // Refresh the tree view to show files from the new path
       treeViewProvider.refreshOnConfigChange();
     }
+  });
+
+  // Handle workspace folder changes
+  vscode.workspace.onDidChangeWorkspaceFolders(() => {
+    Config.recalculatePaths();
+    treeViewProvider.refreshOnConfigChange();
   });
 }
 

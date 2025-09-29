@@ -26,32 +26,29 @@
 
 ## 0.0.7
 
-- Changelog updates
-- **_Important Note !!!_**  
-  Prior to build 0.0.6, upgrading scratchpads will remove all previously created scratchpads.  
-  Assuming the old extension folder was not removed yet by vscode, you can attempt to retrieve the old scratchpads from
-  %USERPROFILE%\\.vscode\\extensions\\buenon.scratchpads-<OLD_VERSION>\\scratchpads\\  
-  As of build 0.0.6 the new scratchpads location is
-  %USERPROFILE%\\AppData\\Roaming\\Code\\User\\globalStorage\\buenon.scratchpads\\scratchpads\\
+- **⚠️ IMPORTANT MIGRATION NOTE**
+- Prior to build 0.0.6, upgrading scratchpads will remove all previously created scratchpads
+- Assuming the old extension folder was not removed yet by vscode, you can attempt to retrieve the old scratchpads from `%USERPROFILE%\.vscode\extensions\buenon.scratchpads-<OLD_VERSION>\scratchpads\`
+- As of build 0.0.6 the new scratchpads location is `%USERPROFILE%\AppData\Roaming\Code\User\globalStorage\buenon.scratchpads\scratchpads\`
 
 ## 0.0.8
 
-- [PR #17](https://github.com/buenon/scratchpads/pull/17) - [@omeryagmurlu](https://github.com/omeryagmurlu) - Added
-  remove single scratchpad feature
-- [PR #19](https://github.com/buenon/scratchpads/pull/19) - [@nobodyme](https://github.com/nobodyme) - Create
-  scratchpads with custom file names
+- [PR #17](https://github.com/buenon/scratchpads/pull/17) by [@omeryagmurlu](https://github.com/omeryagmurlu) - Added remove single scratchpad feature
+- [PR #19](https://github.com/buenon/scratchpads/pull/19) by [@nobodyme](https://github.com/nobodyme) - Create scratchpads with custom file names
 
 ## 1.0.0
 
-- File Types
-  - **_BREAKING CHANGE_**: All previously added custom filetypes will be lost.  
-    You'll probably find them in the new list and if not you can re-add them using a new command.
-  - Added more file types based on [language-map](https://github.com/blakeembrey/language-map)
-  - Added a new command `Scratchpads: New filetype` for adding new filetypes to the list
-- New features
-  - Auto paste clipboard text into newly created scratchpads
-  - Auto format document (_works if auto paste is enabled_)
-  - Specify a custom scratchpads folder (_When changing folders the data will not be moved automatically_)
+**🚨 BREAKING CHANGE**
+
+- All previously added custom filetypes will be lost. You'll probably find them in the new list and if not you can re-add them using a new command
+
+**✨ NEW FEATURES**
+
+- Added more file types based on [language-map](https://github.com/blakeembrey/language-map)
+- Added new command `Scratchpads: New filetype` for adding new filetypes to the list
+- Auto paste clipboard text into newly created scratchpads
+- Auto format document (works if auto paste is enabled)
+- Specify a custom scratchpads folder (when changing folders the data will not be moved automatically)
 - Prompt for filename when creating a new scratchpad is now optional (default off)
 
 ## 1.0.1
@@ -68,18 +65,45 @@
 
 ## 1.2.0
 
-- [#62](https://github.com/buenon/scratchpads/issues/62) - **Explorer Integration**: Display scratchpad files directly in the VSCode Explorer panel
-  - File management with inline rename and delete buttons
-  - Quick actions toolbar for creating and removing scratchpads
-  - Configuration option: `scratchpads.showInExplorer` (default: true)
-  - [@d0whc3r](https://github.com/d0whc3r) - Opened a PR that unfortunately was missed by me. Sorry about that, and thanks for the contribution!
-- **Global/Project Scratchpad Organization**: Choose between project-specific or global scratchpad storage
-  - **Project-specific subfolders (default)**: Each project gets its own scratchpad folder
-  - **Global scratchpads**: All scratchpads are saved in a single shared folder
-  - Configuration option: `scratchpads.useSubfolders` (default: true)
-  - Thanks to [@h-ahl](https://github.com/h-ahl) for contributing the feature implementation
+**✨ NEW FEATURES**
+
+- Explorer Integration ([#62](https://github.com/buenon/scratchpads/issues/62)) - Display scratchpad files directly in VSCode Explorer panel
+- File management with inline rename and delete buttons for scratchpad files
+- Quick actions toolbar for easy creation and removal of scratchpads from Explorer
+- Global/Project organization - Choose between project-specific or global scratchpad storage
+- Configuration options: `scratchpads.showInExplorer` (default: true) and `scratchpads.useSubfolders` (default: true)
+
+**🙏 CONTRIBUTORS**
+
+- [@d0whc3r](https://github.com/d0whc3r) - Thanks for the contribution to the Explorer Integration feature (sorry for missing the initial PR!)
+- [@h-ahl](https://github.com/h-ahl) - Thanks for implementing the global/project organization feature
 
 ## 1.2.1
 
 - Added sort actions to treeview
 - Added treeview item description (size and date)
+
+## 2.0.0
+
+**🚨 BREAKING CHANGES**
+
+- Fixed critical bug in project folder identification that may cause existing scratchpads to not appear in UI after upgrade
+- Default behavior changed: Global shared folder is now the default (was project-specific folders)
+- 🟢 Your files are safe on disk - use the new "Open scratchpads folder" command to locate them
+
+**🐛 BUG FIXES**
+
+- [#67](https://github.com/buenon/scratchpads/issues/67) - Fixed filename validation to prevent invalid characters and subdirectory creation
+- [#69](https://github.com/buenon/scratchpads/issues/69) - Fixed project path calculation to use workspace folder path instead of VS Code installation path
+
+**✨ NEW FEATURES**
+
+- New command: `Scratchpads: Open scratchpads folder` with cross-platform support
+- New command: `Scratchpads: Remove custom filetype` to clean up your custom filetype list
+- One-time popup informs users and helps them locate existing files after upgrade
+- Automatic configuration migration preserves user preferences during setting migration
+
+**📋 CONFIGURATION MIGRATION**
+
+- `useSubfolders: true` becomes `useGlobalFolder: false`
+- `useSubfolders: false` becomes `useGlobalFolder: true`

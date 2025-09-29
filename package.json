@@ -2,7 +2,7 @@
   "name": "scratchpads",
   "displayName": "Scratchpads",
   "description": "Create multiple scratchpad files of different file types",
-  "version": "1.2.1",
+  "version": "2.0.0",
   "publisher": "buenon",
   "author": {
     "name": "Nadav Bueno",
@@ -74,7 +74,13 @@
         "scratchpads.useSubfolders": {
           "type": "boolean",
           "default": true,
-          "description": "Save scratchpads in project-specific subfolders. When disabled, all scratchpads are saved in a single folder."
+          "description": "⚠️ DEPRECATED: Use 'useGlobalFolder' instead. Save scratchpads in project-specific subfolders. When disabled, all scratchpads are saved in a single folder.",
+          "deprecationMessage": "This setting is deprecated. Use 'scratchpads.useGlobalFolder' instead for clearer configuration."
+        },
+        "scratchpads.useGlobalFolder": {
+          "type": "boolean",
+          "default": true,
+          "description": "Save all scratchpads in a single global folder instead of project-specific subfolders. When enabled, scratchpads are shared across all projects."
         }
       }
     },
@@ -119,6 +125,14 @@
       {
         "command": "scratchpads.newFiletype",
         "title": "Scratchpads: New filetype"
+      },
+      {
+        "command": "scratchpads.removeFiletype",
+        "title": "Scratchpads: Remove custom filetype"
+      },
+      {
+        "command": "scratchpads.openFolder",
+        "title": "Scratchpads: Open scratchpads folder"
       },
       {
         "command": "scratchpads.tree.rename",
@@ -257,7 +271,8 @@
     "watch-tests": "tsc -p . -w --outDir out",
     "pretest": "npm run compile-tests && npm run compile && npm run lint",
     "lint": "eslint src --ext ts",
-    "test": "node ./out/test/runTest.js"
+    "test": "node ./out/test/runTest.js",
+    "vsix": "npx vsce package"
   },
   "dependencies": {
     "language-map": "^1.5.0",

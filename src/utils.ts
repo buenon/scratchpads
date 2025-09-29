@@ -4,6 +4,7 @@ import * as vscode from 'vscode';
 import { commands, window } from 'vscode';
 import { Config } from './config';
 import { ACTIONS_TIMEOUT } from './consts';
+import { InputBox } from './input-box';
 
 export default class Utils {
   /**
@@ -89,6 +90,39 @@ export default class Utils {
   }
 
   /**
+   * Opens the scratchpads folder with fallback chain:
+   * 1. Try external file manager
+   * 2. Fallback to new VS Code window
+   * 3. Fallback to message with copy button
+   */
+  public static async openScratchpadsFolder(): Promise<void> {
+    const folderPath = Config.scratchpadsRootPath;
+
+    try {
+      // First attempt: Open in external file manager
+      await vscode.env.openExternal(vscode.Uri.file(folderPath));
+    } catch (externalError) {
+      try {
+        // Second attempt: Open in new VS Code window
+        await vscode.commands.executeCommand('vscode.openFolder', vscode.Uri.file(folderPath), {
+          forceNewWindow: true,
+        });
+      } catch (vscodeError) {
+        // Final fallback: Show message with copy button
+        const action = await vscode.window.showInformationMessage(
+          `Could not open folder automatically. Scratchpads folder: ${folderPath}`,
+          'Copy Path',
+        );
+
+        if (action === 'Copy Path') {
+          await vscode.env.clipboard.writeText(folderPath);
+          vscode.window.showInformationMessage('Path copied to clipboard');
+        }
+      }
+    }
+  }
+
+  /**
    * Open a file in VSCode editor
    * @param filePath Full path to the file
    */
@@ -139,7 +173,7 @@ export default class Utils {
     const baseName = path.basename(currentFileName, fileExt);
     const renameWithExt = Config.getExtensionConfiguration('renameWithExtension');
 
-    return await vscode.window.showInputBox({
+    return await InputBox.show({
       placeHolder: 'Enter new filename:',
       value: renameWithExt ? currentFileName : baseName,
     });

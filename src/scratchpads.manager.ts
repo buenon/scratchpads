@@ -14,6 +14,7 @@ import {
   DEFAULT_FILE_PREFIX,
 } from './consts';
 import { Filetype, FiletypesManager } from './filetypes.manager';
+import { InputBox } from './input-box';
 import Utils from './utils';
 
 export class ScratchpadsManager {
@@ -43,7 +44,7 @@ export class ScratchpadsManager {
       const isPromptForFilename = Config.getExtensionConfiguration(CONFIG_PROMPT_FOR_FILENAME);
 
       if (isPromptForFilename) {
-        const filenameFromUser = await window.showInputBox({
+        const filenameFromUser = await InputBox.show({
           placeHolder: 'Enter a filename:',
         });
 
@@ -233,6 +234,13 @@ export class ScratchpadsManager {
   public async newFiletype() {
     const newFileType = await this.filetypeManager.newFiletype();
     newFileType && (await this.createScratchpad(newFileType));
+  }
+
+  /**
+   * Remove a custom filetype
+   */
+  public async removeFiletype() {
+    return await this.filetypeManager.removeFiletype();
   }
 
   /**
