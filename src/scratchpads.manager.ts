@@ -237,6 +237,13 @@ export class ScratchpadsManager {
   }
 
   /**
+   * Remove a custom filetype
+   */
+  public async removeFiletype() {
+    return await this.filetypeManager.removeFiletype();
+  }
+
+  /**
    * Automatically format the text inside the given document
    * @param doc the document to format
    */

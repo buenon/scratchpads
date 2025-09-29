@@ -35,6 +35,7 @@ export async function activate(context: vscode.ExtensionContext) {
     'scratchpads.removeAllScratchpads': () => Utils.confirmFolder() && scratchpadsManager.removeAllScratchpads(),
     'scratchpads.removeScratchpad': () => Utils.confirmFolder() && scratchpadsManager.removeScratchpad(),
     'scratchpads.newFiletype': () => Utils.confirmFolder() && scratchpadsManager.newFiletype(),
+    'scratchpads.removeFiletype': () => Utils.confirmFolder() && scratchpadsManager.removeFiletype(),
     'scratchpads.openFolder': () => Utils.openScratchpadsFolder(),
     'scratchpads.tree.rename': (fileName: string) => Utils.confirmFolder() && treeViewProvider.renameFile(fileName),
     'scratchpads.tree.delete': (fileName: string) => Utils.confirmFolder() && treeViewProvider.deleteFile(fileName),
