@@ -19,7 +19,7 @@ export class InputBox {
   public static async show(options: InputBoxOptions): Promise<string | undefined> {
     const validChars = options.allowSpaces ? this.displayNameChars : this.filenameChars;
     const result = await this.createFilteredInputBox(options, validChars);
-    return result?.replace(/^[\.\s]+/, '').replace(/[\.\s]+$/, '');
+    return result?.replace(/^[\.\s]+/, '').replace(/[\.\s]+$/, '').replace(/\.+/, '.');
   }
 
   /**

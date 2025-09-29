@@ -120,6 +120,7 @@ To ensure your scratchpads work correctly across all systems, filenames are auto
 - **Numbers**: `0-9`
 - **Symbols**: `_` (underscore), `-` (hyphen), `.` (dot)
 - Leading or trailing dots and spaces are automatically removed
+- 2 or more consecutive dots are replaced with a single dot
 
 ## 📂 **Folder Organization Explained**
 
