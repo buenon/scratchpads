@@ -83,6 +83,7 @@ Due to a critical bugfix in how project folders are identified and a change in t
 | `Scratchpads: Remove scratchpad`       | Delete a specific scratchpad   | Clean up individual files              |
 | `Scratchpads: Remove all scratchpads`  | Delete all scratchpads at once | Complete cleanup                       |
 | `Scratchpads: New filetype`            | Add custom file extensions     | Support for new languages or formats   |
+| `Scratchpads: Remove custom filetype`  | Remove custom file extensions  | Clean up your filetype list            |
 | `Scratchpads: Open scratchpads folder` | Open scratchpads folder        | Access your files directly             |
 
 ### Explorer Panel (Optional)

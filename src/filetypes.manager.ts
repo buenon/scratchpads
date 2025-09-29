@@ -85,6 +85,63 @@ export class FiletypesManager {
   }
 
   /**
+   * Remove a custom filetype from the recent/custom filetypes list
+   */
+  public async removeFiletype(): Promise<void> {
+    // Filter to only show truly custom filetypes (not built-in ones)
+    const customFiletypes = this.recentFiletypes.filter((filetype) => !this.isBuiltInFiletype(filetype.ext));
+
+    if (customFiletypes.length === 0) {
+      window.showInformationMessage('Scratchpads: No custom filetypes to remove');
+      return;
+    }
+
+    // Create quick pick items for custom filetypes only
+    const items: vscode.QuickPickItem[] = customFiletypes.map((filetype) => ({
+      label: filetype.name,
+      description: `(${filetype.ext})`,
+    }));
+
+    const selection = await window.showQuickPick(items, {
+      placeHolder: 'Select a custom filetype to remove',
+      matchOnDescription: true,
+    });
+
+    if (!selection) {
+      return;
+    }
+
+    // Remove the selected filetype
+    const extensionToRemove = selection.description?.replace('(', '').replace(')', '') || '';
+    this.recentFiletypes = this.recentFiletypes.filter((filetype) => filetype.ext !== extensionToRemove);
+
+    // Save updated list
+    fs.writeFileSync(Config.recentFiletypesFilePath, JSON.stringify(this.recentFiletypes, undefined, 2));
+    this.isFiletypeItemsDirty = true;
+
+    window.showInformationMessage(`Scratchpads: Removed custom filetype ${extensionToRemove}`);
+  }
+
+  /**
+   * Check if a filetype extension is built-in (from language-map) or custom
+   * @param ext The extension to check (with or without leading dot)
+   * @returns true if the extension is built-in, false if it's custom
+   */
+  private isBuiltInFiletype(ext: string): boolean {
+    const normalizedExt = this.normalizeExtension(ext);
+
+    // Check main filetypes
+    const isInMain = this.mainFiletypes.some((filetype) => this.normalizeExtension(filetype.ext) === normalizedExt);
+
+    // Check additional filetypes
+    const isInAdditional = this.additionalFiletypes.some(
+      (filetype) => this.normalizeExtension(filetype.ext) === normalizedExt,
+    );
+
+    return isInMain || isInAdditional;
+  }
+
+  /**
    * Loads and organizes filetypes from language-map package.
    * Separates filetypes into:
    * - Main filetypes (primary language associations)
