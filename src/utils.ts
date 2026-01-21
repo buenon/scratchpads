@@ -13,18 +13,42 @@ export default class Utils {
    * @returns boolean indicating if the folder is ready for use
    */
   public static confirmFolder(): boolean {
-    if (!fs.existsSync(Config.projectScratchpadsPath)) {
-      if (Utils.validateFolderCreatable(Config.projectScratchpadsPath)) {
-        fs.mkdirSync(Config.projectScratchpadsPath, { recursive: true });
-      } else {
-        window.showInformationMessage(
-          `Scratchpads: Invalid scratchpads path given (${Config.customPath}). Check configuration...`,
-        );
-        return false;
+    try {
+      if (!Config.projectScratchpadsPath) {
+        console.error('[Scratchpads] confirmFolder: projectScratchpadsPath is undefined, attempting recovery...');
+        try {
+          Config.recalculatePaths();
+          if (Config.projectScratchpadsPath) {
+            console.log('[Scratchpads] Recovery succeeded, projectScratchpadsPath is now set');
+          } else {
+            throw new Error('recalculatePaths() did not set projectScratchpadsPath');
+          }
+        } catch (recoveryError) {
+          console.error('[Scratchpads] Recovery failed:', recoveryError);
+          window.showErrorMessage(
+            'Scratchpads: Configuration error. Check Developer Console (Help > Toggle Developer Tools) for details.',
+          );
+          return false;
+        }
       }
-    }
 
-    return true;
+      if (!fs.existsSync(Config.projectScratchpadsPath)) {
+        if (Utils.validateFolderCreatable(Config.projectScratchpadsPath)) {
+          fs.mkdirSync(Config.projectScratchpadsPath, { recursive: true });
+        } else {
+          window.showInformationMessage(
+            `Scratchpads: Invalid scratchpads path given (${Config.customPath}). Check configuration...`,
+          );
+          return false;
+        }
+      }
+
+      return true;
+    } catch (error) {
+      console.error('[Scratchpads] confirmFolder error:', error);
+      window.showErrorMessage(`Scratchpads: Error accessing folder. ${error instanceof Error ? error.message : String(error)}`);
+      return false;
+    }
   }
 
   /**

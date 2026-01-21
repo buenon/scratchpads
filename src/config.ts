@@ -28,12 +28,22 @@ export class Config {
    * @param context The VSCode extension context
    */
   public static async init(context: vscode.ExtensionContext) {
-    this.context = context;
-    this.extensionConfig = vscode.workspace.getConfiguration('scratchpads');
-    this.globalPath = context.globalStorageUri.fsPath;
-    await this.migrateConfig();
-    this.recalculatePaths();
-    await this.showV2BreakingChangeNotification();
+    try {
+      this.context = context;
+      this.extensionConfig = vscode.workspace.getConfiguration('scratchpads');
+      this.globalPath = context.globalStorageUri.fsPath;
+      
+      if (!this.globalPath) {
+        throw new Error('globalStorageUri.fsPath is undefined');
+      }
+      
+      await this.migrateConfig();
+      this.recalculatePaths();
+      await this.showV2BreakingChangeNotification();
+    } catch (error) {
+      console.error('[Scratchpads] Config.init error:', error);
+      throw error;
+    }
   }
 
   /**
@@ -85,20 +95,30 @@ export class Config {
    * Called when configuration changes or during initialization.
    */
   public static recalculatePaths() {
-    const workspaceFolder = vscode.workspace.workspaceFolders?.[0]?.uri?.fsPath;
+    try {
+      if (!this.globalPath) {
+        console.error('[Scratchpads] recalculatePaths: globalPath is undefined');
+        return;
+      }
 
-    this.customPath = this.getExtensionConfiguration(CONFIG_SCRATCHPADS_FOLDER) as string;
-    this.scratchpadsRootPath = path.join(this.customPath || this.globalPath, SCRATCHPADS_FOLDER_NAME);
-    this.projectPathMD5 = workspaceFolder ? Md5.hashStr(workspaceFolder) : '';
+      const workspaceFolder = vscode.workspace.workspaceFolders?.[0]?.uri?.fsPath;
 
-    // Use global folder if configured, otherwise use project-specific folders
-    if (this.shouldUseGlobalFolder(workspaceFolder)) {
-      this.projectScratchpadsPath = path.join(this.scratchpadsRootPath, GLOBAL_SCRATCHPADS_FOLDER_NAME);
-    } else {
-      this.projectScratchpadsPath = path.join(this.scratchpadsRootPath, this.projectPathMD5);
+      this.customPath = this.getExtensionConfiguration(CONFIG_SCRATCHPADS_FOLDER) as string;
+      this.scratchpadsRootPath = path.join(this.customPath || this.globalPath, SCRATCHPADS_FOLDER_NAME);
+      this.projectPathMD5 = workspaceFolder ? Md5.hashStr(workspaceFolder) : '';
+
+      // Use global folder if configured, otherwise use project-specific folders
+      if (this.shouldUseGlobalFolder(workspaceFolder)) {
+        this.projectScratchpadsPath = path.join(this.scratchpadsRootPath, GLOBAL_SCRATCHPADS_FOLDER_NAME);
+      } else {
+        this.projectScratchpadsPath = path.join(this.scratchpadsRootPath, this.projectPathMD5);
+      }
+
+      this.recentFiletypesFilePath = path.join(this.scratchpadsRootPath, RECENT_FILETYPES_FILE);
+    } catch (error) {
+      console.error('[Scratchpads] recalculatePaths error:', error);
+      throw error;
     }
-
-    this.recentFiletypesFilePath = path.join(this.scratchpadsRootPath, RECENT_FILETYPES_FILE);
   }
 
   /**
