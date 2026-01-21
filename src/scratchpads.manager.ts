@@ -46,6 +46,7 @@ export class ScratchpadsManager {
       if (isPromptForFilename) {
         const filenameFromUser = await InputBox.show({
           placeHolder: 'Enter a filename:',
+          allowSpaces: true,
         });
 
         if (filenameFromUser) {
