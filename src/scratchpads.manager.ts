@@ -28,7 +28,7 @@ export class ScratchpadsManager {
    * Creates a new scratchpad file with the specified or selected filetype.
    * Handles:
    * - Custom filename prompting (if enabled)
-   * - Automatic file numbering for duplicates
+   * - Shared counter across all file types (fills gaps)
    * - Content pasting and formatting (if enabled)
    * @param filetype Optional predefined filetype, or prompts for selection
    */
@@ -38,7 +38,6 @@ export class ScratchpadsManager {
     }
 
     if (filetype) {
-      let i = 0;
       const configPrefix = Config.getExtensionConfiguration(CONFIG_FILE_PREFIX) as string;
       let baseFilename = configPrefix || DEFAULT_FILE_PREFIX;
       const isPromptForFilename = Config.getExtensionConfiguration(CONFIG_PROMPT_FOR_FILENAME);
@@ -46,6 +45,7 @@ export class ScratchpadsManager {
       if (isPromptForFilename) {
         const filenameFromUser = await InputBox.show({
           placeHolder: 'Enter a filename:',
+          allowSpaces: true,
         });
 
         if (filenameFromUser) {
@@ -53,27 +53,21 @@ export class ScratchpadsManager {
         }
       }
 
-      let finalFilename = `${baseFilename}${filetype.ext}`;
-      let fullPath = Utils.getScratchpadFilePath(finalFilename);
-
-      // Find an available filename
-      while (fs.existsSync(fullPath)) {
-        i = i + 1;
-        finalFilename = `${baseFilename}${i}${filetype.ext}`;
-        fullPath = Utils.getScratchpadFilePath(finalFilename);
+      // Check if base filename exists (without number, any extension)
+      const baseExists = this.baseFilenameExists(baseFilename);
+      
+      let finalFilename: string;
+      if (!baseExists) {
+        // Base filename is available, use it
+        finalFilename = `${baseFilename}${filetype.ext}`;
+      } else {
+        // Base filename exists, find next available number (shared across all extensions)
+        const nextNumber = this.findNextAvailableNumber(baseFilename);
+        finalFilename = `${baseFilename}${nextNumber}${filetype.ext}`;
       }
 
-      const isAutoPaste = Config.getExtensionConfiguration(CONFIG_AUTO_PASTE);
-      const isAutoFormat = Config.getExtensionConfiguration(CONFIG_AUTO_FORMAT);
-      const data = isAutoPaste ? await vscode.env.clipboard.readText() : '';
-
-      fs.writeFileSync(fullPath, data);
-      await Utils.openFile(fullPath);
-
-      if (isAutoPaste && isAutoFormat) {
-        const doc = await vscode.workspace.openTextDocument(fullPath);
-        await this.autoFormatDoc(doc);
-      }
+      const fullPath = Utils.getScratchpadFilePath(finalFilename);
+      await this.createAndOpenScratchpadFile(fullPath);
     }
   }
 
@@ -244,6 +238,25 @@ export class ScratchpadsManager {
   }
 
   /**
+   * Creates a scratchpad file, optionally pastes clipboard content, and opens it.
+   * Also auto-formats if both auto-paste and auto-format are enabled.
+   * @param filePath The full path where the file should be created
+   */
+  private async createAndOpenScratchpadFile(filePath: string): Promise<void> {
+    const isAutoPaste = Config.getExtensionConfiguration(CONFIG_AUTO_PASTE);
+    const isAutoFormat = Config.getExtensionConfiguration(CONFIG_AUTO_FORMAT);
+    const data = isAutoPaste ? await vscode.env.clipboard.readText() : '';
+
+    fs.writeFileSync(filePath, data);
+    await Utils.openFile(filePath);
+
+    if (isAutoPaste && isAutoFormat) {
+      const doc = await vscode.workspace.openTextDocument(filePath);
+      await this.autoFormatDoc(doc);
+    }
+  }
+
+  /**
    * Automatically format the text inside the given document
    * @param doc the document to format
    */
@@ -337,5 +350,76 @@ export class ScratchpadsManager {
     }
 
     window.showInformationMessage('Scratchpads: Removed all scratchpads');
+  }
+
+  /**
+   * Checks if a base filename exists (without number, any extension).
+   * @param baseFilename The filename prefix to check (e.g., "s" or "scratch")
+   * @returns true if any file exists matching baseFilename.{anyExtension}
+   */
+  private baseFilenameExists(baseFilename: string): boolean {
+    const files = Utils.getScratchpadFiles();
+    const escapedPrefix = baseFilename.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    
+    // Pattern to match: baseFilename.{anyExtension} (no number)
+    const basePattern = new RegExp(`^${escapedPrefix}\\.(.+)$`);
+    
+    for (const file of files) {
+      if (basePattern.test(file)) {
+        return true;
+      }
+    }
+    
+    return false;
+  }
+
+  /**
+   * Finds the next available number for a given filename prefix.
+   * Checks all scratchpad files to find gaps in the numbering sequence.
+   * Returns the lowest available number starting from 1.
+   * 
+   * Example: If files exist: s.js, s1.ts, s3.sql, s4.js
+   * - Base s.js exists, so we check numbered files
+   * - Numbers found: [1, 3, 4]
+   * - Lowest gap: 2
+   * - Returns: 2
+   * 
+   * @param baseFilename The filename prefix (e.g., "s" or "scratch")
+   * @returns The next available number (1, 2, 3, ...) or 1 if no numbered files exist
+   */
+  private findNextAvailableNumber(baseFilename: string): number {
+    const files = Utils.getScratchpadFiles();
+    
+    // Escape special regex characters in the base filename
+    const escapedPrefix = baseFilename.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    
+    // Pattern to match: baseFilename{number}.{anyExtension}
+    // Examples: s1.js, s2.ts, scratch10.py
+    const numberedPattern = new RegExp(`^${escapedPrefix}(\\d+)\\.(.+)$`);
+    
+    // Extract all numbers from files matching the pattern
+    const usedNumbers = new Set<number>();
+    
+    for (const file of files) {
+      const match = file.match(numberedPattern);
+      if (match) {
+        const number = parseInt(match[1], 10);
+        usedNumbers.add(number);
+      }
+    }
+    
+    // Find the lowest missing number starting from 1
+    // If no numbered files exist, return 1
+    if (usedNumbers.size === 0) {
+      return 1;
+    }
+    
+    // Find the first gap in the sequence [1, 2, 3, ...]
+    let candidate = 1;
+    while (usedNumbers.has(candidate)) {
+      candidate++;
+    }
+    
+    return candidate;
   }
 }

@@ -8,14 +8,21 @@ A powerful VSCode extension that lets you create temporary files for quick notes
 
 ## 🚨 **Breaking Changes in v2.0.0**
 
-**⚠️ Important**: If you're upgrading from v1.x, please read this carefully:
+**⚠️ Important**: If you're upgrading from v1.x, your existing scratchpads may not appear in the UI. Your files are safe on disk!
 
-### **Scratchpads Location Bugfix**
+### **What Changed?**
 
-Due to a critical bugfix in how project folders are identified and a change in the default **Global** / **Per project** behavior , your existing scratchpads may not appear in the UI after upgrading.  
-**Don't worry - your files are still safe on disk!**
+**Bug fix**: v1.x incorrectly used the VS Code installation path (same for all projects) instead of the workspace path to generate project folder hashes. This caused all projects to share the same folder hash.
 
-**Solution**: Use the `Scratchpads: Open scratchpads folder` command to locate and access your existing files and safely move them to their new location.
+**v2.0.0 fixes**: Project hash now uses the actual workspace folder path. Default changed from project-specific to global folder.
+
+### **Recovery Steps**
+
+1. Run `Scratchpads: Open scratchpads folder` (opens `<storage>/scratchpads/` root)
+2. Find your files in hash-named folders (32-char MD5 strings)
+3. Move files to:
+   - **Global mode** (default): `<storage>/scratchpads/__globalScratchpads__/`
+   - **Project-specific mode**: `<storage>/scratchpads/<new-project-hash>/` (create a test scratchpad to see the new hash)
 
 ## ✨ Features
 
@@ -119,8 +126,16 @@ To ensure your scratchpads work correctly across all systems, filenames are auto
 - **Letters**: `A-Z`, `a-z`
 - **Numbers**: `0-9`
 - **Symbols**: `_` (underscore), `-` (hyphen), `.` (dot)
+- **Spaces**: Spaces are now supported within filenames (v2.1.0+)
 - Leading or trailing dots and spaces are automatically removed
 - 2 or more consecutive dots are replaced with a single dot
+
+### 💡 **Examples**
+
+- `my scratch notes.js`
+- `API endpoints v2.json`
+- `quick-test.py`
+- `notes 2024.md`
 
 ## 📂 **Folder Organization Explained**
 
@@ -156,6 +171,17 @@ When VS Code has no workspace or folder open:
 - **Use Auto Format** along with **Auto Paste** to automatically format the clipboard content
 - **Organize by project** to keep scratchpads separate
 - **Add keyboard shortcuts** for your most-used commands
+
+## 💖 Support the Project
+
+If you find Scratchpads useful, consider supporting its development:
+
+- ⭐ [Star this repository](https://github.com/buenon/scratchpads)
+- 💝 [Say Thanks on GitHub](https://github.com/sponsors/buenon)
+- 🐛 [Report bugs or suggest features](https://github.com/buenon/scratchpads/issues)
+- 📢 Share with fellow developers
+
+Your support helps maintain and improve Scratchpads!
 
 ## Source
 

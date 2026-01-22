@@ -13,7 +13,13 @@ import Utils from './utils';
  * @param context The extension context provided by VSCode
  */
 export async function activate(context: vscode.ExtensionContext) {
-  await Config.init(context);
+  try {
+    await Config.init(context);
+  } catch (error) {
+    console.error('[Scratchpads] Activation failed during Config.init:', error);
+    vscode.window.showErrorMessage(`Scratchpads: Failed to initialize. Check Developer Console for details.`);
+    return;
+  }
 
   const scratchpadsManager = new ScratchpadsManager(new FiletypesManager());
 
@@ -26,25 +32,47 @@ export async function activate(context: vscode.ExtensionContext) {
   context.subscriptions.push(treeView);
   context.subscriptions.push(treeViewProvider);
 
+  /**
+   * Wraps a command handler with error handling and optional folder confirmation
+   */
+  function wrapCommand(
+    commandName: string,
+    handler: (...args: any[]) => Promise<void> | void,
+    requireFolder = true,
+  ): (...args: any[]) => Promise<void> | void {
+    return async (...args: any[]) => {
+      try {
+        if (requireFolder && !Utils.confirmFolder()) {
+          return;
+        }
+        await handler(...args);
+      } catch (error) {
+        console.error(`[Scratchpads] ${commandName} error:`, error);
+        const errorMessage = error instanceof Error ? error.message : String(error);
+        vscode.window.showErrorMessage(`Scratchpads: ${commandName} failed. ${errorMessage}`);
+      }
+    };
+  }
+
   const commands: { [key: string]: (...args: any[]) => any } = {
-    'scratchpads.newScratchpad': () => Utils.confirmFolder() && scratchpadsManager.createScratchpad(),
-    'scratchpads.newScratchpadDefault': () => Utils.confirmFolder() && scratchpadsManager.createScratchpadDefault(),
-    'scratchpads.openScratchpad': () => Utils.confirmFolder() && scratchpadsManager.openScratchpad(),
-    'scratchpads.openLatestScratchpad': () => Utils.confirmFolder() && scratchpadsManager.openLatestScratchpad(),
-    'scratchpads.renameScratchpad': () => Utils.confirmFolder() && scratchpadsManager.renameScratchpad(),
-    'scratchpads.removeAllScratchpads': () => Utils.confirmFolder() && scratchpadsManager.removeAllScratchpads(),
-    'scratchpads.removeScratchpad': () => Utils.confirmFolder() && scratchpadsManager.removeScratchpad(),
-    'scratchpads.newFiletype': () => Utils.confirmFolder() && scratchpadsManager.newFiletype(),
-    'scratchpads.removeFiletype': () => Utils.confirmFolder() && scratchpadsManager.removeFiletype(),
-    'scratchpads.openFolder': () => Utils.openScratchpadsFolder(),
-    'scratchpads.tree.rename': (fileName: string) => Utils.confirmFolder() && treeViewProvider.renameFile(fileName),
-    'scratchpads.tree.delete': (fileName: string) => Utils.confirmFolder() && treeViewProvider.deleteFile(fileName),
-    'scratchpads.tree.new': () => Utils.confirmFolder() && scratchpadsManager.createScratchpad(),
-    'scratchpads.tree.newDefault': () => Utils.confirmFolder() && scratchpadsManager.createScratchpadDefault(),
+    'scratchpads.newScratchpad': wrapCommand('newScratchpad', () => scratchpadsManager.createScratchpad()),
+    'scratchpads.newScratchpadDefault': wrapCommand('newScratchpadDefault', () => scratchpadsManager.createScratchpadDefault()),
+    'scratchpads.openScratchpad': wrapCommand('openScratchpad', () => scratchpadsManager.openScratchpad()),
+    'scratchpads.openLatestScratchpad': wrapCommand('openLatestScratchpad', () => scratchpadsManager.openLatestScratchpad()),
+    'scratchpads.renameScratchpad': wrapCommand('renameScratchpad', () => scratchpadsManager.renameScratchpad()),
+    'scratchpads.removeAllScratchpads': wrapCommand('removeAllScratchpads', () => scratchpadsManager.removeAllScratchpads()),
+    'scratchpads.removeScratchpad': wrapCommand('removeScratchpad', () => scratchpadsManager.removeScratchpad()),
+    'scratchpads.newFiletype': wrapCommand('newFiletype', () => scratchpadsManager.newFiletype()),
+    'scratchpads.removeFiletype': wrapCommand('removeFiletype', () => scratchpadsManager.removeFiletype()),
+    'scratchpads.openFolder': wrapCommand('openFolder', () => Utils.openScratchpadsFolder(), false),
+    'scratchpads.tree.rename': wrapCommand('tree.rename', (fileName: string) => treeViewProvider.renameFile(fileName)),
+    'scratchpads.tree.delete': wrapCommand('tree.delete', (fileName: string) => treeViewProvider.deleteFile(fileName)),
+    'scratchpads.tree.new': wrapCommand('tree.new', () => scratchpadsManager.createScratchpad()),
+    'scratchpads.tree.newDefault': wrapCommand('tree.newDefault', () => scratchpadsManager.createScratchpadDefault()),
     'scratchpads.tree.sortByName': () => treeViewProvider.sortByName(),
     'scratchpads.tree.sortByDate': () => treeViewProvider.sortByDate(),
     'scratchpads.tree.sortByType': () => treeViewProvider.sortByType(),
-    'scratchpads.tree.removeAll': () => Utils.confirmFolder() && scratchpadsManager.removeAllScratchpads(),
+    'scratchpads.tree.removeAll': wrapCommand('tree.removeAll', () => scratchpadsManager.removeAllScratchpads()),
   };
 
   for (const command in commands) {
