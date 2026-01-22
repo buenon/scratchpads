@@ -1,6 +1,6 @@
 # Scratchpads
 
-[![Say Thanks](https://img.shields.io/badge/Say%20Thanks-❤-red?logo=github)](https://github.com/sponsors/YOUR-USERNAME)
+[![Say Thanks](https://img.shields.io/badge/Say%20Thanks-❤-red?logo=github)](https://github.com/sponsors/buenon)
 
 > **Create multiple scratchpad files for doodling while you're coding**
 
