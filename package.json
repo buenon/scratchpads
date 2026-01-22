@@ -8,6 +8,9 @@
     "name": "Nadav Bueno",
     "email": "buenonadav@gmail.com"
   },
+  "sponsor": {
+    "url": "https://github.com/sponsors/buenon"
+  },
   "license": "MIT",
   "homepage": "https://github.com/buenon/scratchpads/blob/master/README.md",
   "repository": {
