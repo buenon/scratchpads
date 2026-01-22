@@ -1,7 +1,5 @@
 # Scratchpads
 
-[![Say Thanks](https://img.shields.io/badge/Say%20Thanks-❤-red?logo=github)](https://github.com/sponsors/buenon)
-
 > **Create multiple scratchpad files for doodling while you're coding**
 
 A powerful VSCode extension that lets you create temporary files for quick notes, code snippets, and experimentation without cluttering your project workspace.
@@ -128,8 +126,16 @@ To ensure your scratchpads work correctly across all systems, filenames are auto
 - **Letters**: `A-Z`, `a-z`
 - **Numbers**: `0-9`
 - **Symbols**: `_` (underscore), `-` (hyphen), `.` (dot)
+- **Spaces**: Spaces are now supported within filenames (v2.1.0+)
 - Leading or trailing dots and spaces are automatically removed
 - 2 or more consecutive dots are replaced with a single dot
+
+### 💡 **Examples**
+
+- `my scratch notes.js`
+- `API endpoints v2.json`
+- `quick-test.py`
+- `notes 2024.md`
 
 ## 📂 **Folder Organization Explained**
 
@@ -165,6 +171,17 @@ When VS Code has no workspace or folder open:
 - **Use Auto Format** along with **Auto Paste** to automatically format the clipboard content
 - **Organize by project** to keep scratchpads separate
 - **Add keyboard shortcuts** for your most-used commands
+
+## 💖 Support the Project
+
+If you find Scratchpads useful, consider supporting its development:
+
+- ⭐ [Star this repository](https://github.com/buenon/scratchpads)
+- 💝 [Say Thanks on GitHub](https://github.com/sponsors/buenon)
+- 🐛 [Report bugs or suggest features](https://github.com/buenon/scratchpads/issues)
+- 📢 Share with fellow developers
+
+Your support helps maintain and improve Scratchpads!
 
 ## Source
 

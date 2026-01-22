@@ -107,3 +107,19 @@
 
 - `useSubfolders: true` becomes `useGlobalFolder: false`
 - `useSubfolders: false` becomes `useGlobalFolder: true`
+
+## 2.1.0
+
+**✨ NEW FEATURES**
+
+- [#77](https://github.com/buenon/scratchpads/issues/77) - Filenames now support spaces for better readability and organization
+- [#79](https://github.com/buenon/scratchpads/issues/79) - Improve filename counter to be based on filename rather than extension
+- [#83](https://github.com/buenon/scratchpads/issues/83) - Added GitHub Sponsors funding configuration to support the project 💖
+
+**🐛 BUG FIXES**
+
+- [#78](https://github.com/buenon/scratchpads/issues/78) - Improved error handling and logging throughout the extension for better reliability
+
+**📝 IMPROVEMENTS**
+
+- [#76](https://github.com/buenon/scratchpads/issues/76) - Improved clarity of v2.0.0 breaking changes section in README
