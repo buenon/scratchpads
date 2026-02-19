@@ -2,7 +2,7 @@ import * as fs from 'fs';
 import * as vscode from 'vscode';
 import { window } from 'vscode';
 import { Config } from './config';
-import { CONFIG_DEFAULT_FILETYPE } from './consts';
+import { CONFIG_ALLOWED_FILETYPES, CONFIG_DEFAULT_FILETYPE } from './consts';
 import { InputBox } from './input-box';
 
 export interface Filetype {
@@ -24,6 +24,14 @@ export class FiletypesManager {
   constructor() {
     this.loadFiletypes();
     this.prepareItems();
+  }
+
+  /**
+   * Marks the filetype items list as dirty so it will be rebuilt on next access.
+   * Call this when configuration changes affect the filetype list.
+   */
+  public markDirty() {
+    this.isFiletypeItemsDirty = true;
   }
 
   /**
@@ -205,16 +213,21 @@ export class FiletypesManager {
    * Organizes items into sections:
    * - Recent filetypes
    * - All available filetypes (main + additional)
-   * Only rebuilds list if items are marked as dirty
+   * Only rebuilds list if items are marked as dirty.
+   * When allowedFiletypes is configured, filters to only show those extensions.
    */
   private prepareItems() {
     if (!this.filetypeItems.length || this.isFiletypeItemsDirty) {
       this.filetypeItems = [];
-      this.addFiletypeOptionsToSection('Recent', this.recentFiletypes);
-      this.addFiletypeOptionsToSection('File types', [
-        ...this.filterOutRecentFiletypes(this.mainFiletypes),
-        ...this.filterOutRecentFiletypes(this.additionalFiletypes),
-      ]);
+
+      const recentFiletypes = this.filterByAllowList(this.recentFiletypes);
+      const allFiletypes = [
+        ...this.filterOutRecentFiletypes(this.filterByAllowList(this.mainFiletypes)),
+        ...this.filterOutRecentFiletypes(this.filterByAllowList(this.additionalFiletypes)),
+      ];
+
+      this.addFiletypeOptionsToSection('Recent', recentFiletypes);
+      this.addFiletypeOptionsToSection('File types', allFiletypes);
 
       this.isFiletypeItemsDirty = false;
     }
@@ -262,6 +275,23 @@ export class FiletypesManager {
     for (const type of typesToAdd) {
       this.filetypeItems.push({ label: `${type.name} (${type.ext})`, type });
     }
+  }
+
+  /**
+   * Filter items to only include extensions in the allowedFiletypes config.
+   * Returns the original array unmodified if no allow list is configured.
+   * @param items The array to filter
+   * @returns The filtered array
+   */
+  private filterByAllowList(items: Filetype[]) {
+    const allowedFiletypes = (Config.getExtensionConfiguration(CONFIG_ALLOWED_FILETYPES) as string[]) || [];
+    const allowedSet = new Set(allowedFiletypes.map((ext) => this.normalizeExtension(ext)));
+
+    if (allowedSet.size === 0) {
+      return items;
+    }
+
+    return items.filter((item) => allowedSet.has(this.normalizeExtension(item.ext)));
   }
 
   /**
