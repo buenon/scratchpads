@@ -30,6 +30,7 @@ A powerful VSCode extension that lets you create temporary files for quick notes
 
 - Create scratchpads instantly with any file extension
 - Support for 100+ programming languages and file types
+- Restrict the filetype picker to only the extensions you want
 - Full VSCode IntelliSense and syntax highlighting
 - Never interfere with your project's source control
 
@@ -104,18 +105,19 @@ Enable `Scratchpads: Show In Explorer` in settings to:
 
 ## ⚙️ Configuration
 
-| Setting                   | Description                           | Default     | Use When                     |
-| ------------------------- | ------------------------------------- | ----------- | ---------------------------- |
-| **Show In Explorer**      | Display scratchpads in Explorer panel | `false`     | Visual file management       |
-| **Use Global Folder**     | Share scratchpads across all projects | `true`      | Working on multiple projects |
-| **Auto Paste**            | Paste clipboard content automatically | `true`      | Faster workflow              |
-| **Auto Format**           | Format document content automatically | `true`      | Clean, readable code         |
-| **Default Filetype**      | Default extension for quick creation  | `""`        | You prefer one language      |
-| **File Prefix**           | Prefix for new files                  | `"scratch"` | Custom naming convention     |
-| **Prompt For Filename**   | Ask for custom names                  | `false`     | You want control over naming |
-| **Prompt For Removal**    | Confirm before deleting all           | `true`      | Safety against accidents     |
-| **Scratchpads Folder**    | Custom storage location               | Auto        | You want specific location   |
-| **Rename With Extension** | Include extension in rename           | `false`     | You want full control        |
+| Setting                   | Description                              | Default     | Use When                           |
+| ------------------------- | ---------------------------------------- | ----------- | ---------------------------------- |
+| **Show In Explorer**      | Display scratchpads in Explorer panel    | `false`     | Visual file management             |
+| **Use Global Folder**     | Share scratchpads across all projects    | `true`      | Working on multiple projects       |
+| **Auto Paste**            | Paste clipboard content automatically    | `true`      | Faster workflow                    |
+| **Auto Format**           | Format document content automatically    | `true`      | Clean, readable code               |
+| **Default Filetype**      | Default extension for quick creation     | `""`        | You prefer one language            |
+| **Allowed Filetypes**     | Restrict picker to only these extensions | `[]`        | You prefer a shorter filetype list |
+| **File Prefix**           | Prefix for new files                     | `"scratch"` | Custom naming convention           |
+| **Prompt For Filename**   | Ask for custom names                     | `false`     | You want control over naming       |
+| **Prompt For Removal**    | Confirm before deleting all              | `true`      | Safety against accidents           |
+| **Scratchpads Folder**    | Custom storage location                  | Auto        | You want specific location         |
+| **Rename With Extension** | Include extension in rename              | `false`     | You want full control              |
 
 ## 📝 **Filename Guidelines**
 

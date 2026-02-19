@@ -123,3 +123,10 @@
 **📝 IMPROVEMENTS**
 
 - [#76](https://github.com/buenon/scratchpads/issues/76) - Improved clarity of v2.0.0 breaking changes section in README
+
+## 2.2.0
+
+**✨ NEW FEATURES**
+
+- [#87](https://github.com/buenon/scratchpads/pull/87) - New `scratchpads.allowedFiletypes` setting to restrict the filetype picker to only the extensions you want (e.g. `["txt", "md", "js"]`)
+  Thanks [@alexevanczuk](https://github.com/alexevanczuk) for the contribution 🙏
