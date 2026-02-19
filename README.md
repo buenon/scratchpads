@@ -105,19 +105,19 @@ Enable `Scratchpads: Show In Explorer` in settings to:
 
 ## ⚙️ Configuration
 
-| Setting                   | Description                              | Default     | Use When                           |
-| ------------------------- | ---------------------------------------- | ----------- | ---------------------------------- |
-| **Show In Explorer**      | Display scratchpads in Explorer panel    | `false`     | Visual file management             |
-| **Use Global Folder**     | Share scratchpads across all projects    | `true`      | Working on multiple projects       |
-| **Auto Paste**            | Paste clipboard content automatically    | `true`      | Faster workflow                    |
-| **Auto Format**           | Format document content automatically    | `true`      | Clean, readable code               |
-| **Default Filetype**      | Default extension for quick creation     | `""`        | You prefer one language            |
-| **Allowed Filetypes**     | Restrict picker to only these extensions | `[]`        | You prefer a shorter filetype list |
-| **File Prefix**           | Prefix for new files                     | `"scratch"` | Custom naming convention           |
-| **Prompt For Filename**   | Ask for custom names                     | `false`     | You want control over naming       |
-| **Prompt For Removal**    | Confirm before deleting all              | `true`      | Safety against accidents           |
-| **Scratchpads Folder**    | Custom storage location                  | Auto        | You want specific location         |
-| **Rename With Extension** | Include extension in rename              | `false`     | You want full control              |
+| Setting                   | Description                              | Default     | Use When                                              |
+| ------------------------- | ---------------------------------------- | ----------- | ----------------------------------------------------- |
+| **Show In Explorer**      | Display scratchpads in Explorer panel    | `false`     | You want to manage scratchpads in the Explorer        |
+| **Use Global Folder**     | Share scratchpads across all projects    | `true`      | You work across multiple projects                      |
+| **Auto Paste**            | Paste clipboard content automatically    | `true`      | You want to speed up creating scratchpads             |
+| **Auto Format**           | Format document content automatically    | `true`      | You want pasted content auto-formatted                |
+| **Default Filetype**      | Default extension for quick creation     | `""`        | You prefer one default language                        |
+| **Allowed Filetypes**     | Restrict picker to only these extensions | `[]`        | You want a shorter filetype list                       |
+| **File Prefix**           | Prefix for new files                     | `"scratch"` | You want a custom file prefix                          |
+| **Prompt For Filename**   | Ask for custom names                     | `false`     | You want to name each file yourself                    |
+| **Prompt For Removal**    | Confirm before deleting all              | `true`      | You want confirmation before removing all              |
+| **Scratchpads Folder**    | Custom storage location                  | Auto        | You want scratchpads in a specific folder             |
+| **Rename With Extension** | Include extension in rename              | `false`     | You want to include the extension when renaming        |
 
 ## 📝 **Filename Guidelines**
 
