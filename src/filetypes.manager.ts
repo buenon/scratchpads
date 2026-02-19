@@ -220,17 +220,10 @@ export class FiletypesManager {
     if (!this.filetypeItems.length || this.isFiletypeItemsDirty) {
       this.filetypeItems = [];
 
-      const allowedFiletypes = (Config.getExtensionConfiguration(CONFIG_ALLOWED_FILETYPES) as string[]) || [];
-      const allowedSet = new Set(allowedFiletypes.map((ext) => this.normalizeExtension(ext)));
-      const hasAllowList = allowedSet.size > 0;
-
-      const filterByAllowList = (items: Filetype[]) =>
-        hasAllowList ? items.filter((item) => allowedSet.has(this.normalizeExtension(item.ext))) : items;
-
-      const recentFiletypes = filterByAllowList(this.recentFiletypes);
+      const recentFiletypes = this.filterByAllowList(this.recentFiletypes);
       const allFiletypes = [
-        ...this.filterOutRecentFiletypes(filterByAllowList(this.mainFiletypes)),
-        ...this.filterOutRecentFiletypes(filterByAllowList(this.additionalFiletypes)),
+        ...this.filterOutRecentFiletypes(this.filterByAllowList(this.mainFiletypes)),
+        ...this.filterOutRecentFiletypes(this.filterByAllowList(this.additionalFiletypes)),
       ];
 
       this.addFiletypeOptionsToSection('Recent', recentFiletypes);
@@ -282,6 +275,23 @@ export class FiletypesManager {
     for (const type of typesToAdd) {
       this.filetypeItems.push({ label: `${type.name} (${type.ext})`, type });
     }
+  }
+
+  /**
+   * Filter items to only include extensions in the allowedFiletypes config.
+   * Returns the original array unmodified if no allow list is configured.
+   * @param items The array to filter
+   * @returns The filtered array
+   */
+  private filterByAllowList(items: Filetype[]) {
+    const allowedFiletypes = (Config.getExtensionConfiguration(CONFIG_ALLOWED_FILETYPES) as string[]) || [];
+    const allowedSet = new Set(allowedFiletypes.map((ext) => this.normalizeExtension(ext)));
+
+    if (allowedSet.size === 0) {
+      return items;
+    }
+
+    return items.filter((item) => allowedSet.has(this.normalizeExtension(item.ext)));
   }
 
   /**
