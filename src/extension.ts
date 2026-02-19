@@ -21,7 +21,8 @@ export async function activate(context: vscode.ExtensionContext) {
     return;
   }
 
-  const scratchpadsManager = new ScratchpadsManager(new FiletypesManager());
+  const filetypesManager = new FiletypesManager();
+  const scratchpadsManager = new ScratchpadsManager(filetypesManager);
 
   // Register tree view
   const treeViewProvider = new ScratchpadTreeProvider();
@@ -88,6 +89,10 @@ export async function activate(context: vscode.ExtensionContext) {
       Config.recalculatePaths();
       // Refresh the tree view to show files from the new path
       treeViewProvider.refreshOnConfigChange();
+    }
+
+    if (event.affectsConfiguration('scratchpads.allowedFiletypes')) {
+      filetypesManager.markDirty();
     }
   });
 

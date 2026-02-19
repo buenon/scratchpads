@@ -7,6 +7,7 @@ export const GLOBAL_SCRATCHPADS_FOLDER_NAME = '__globalScratchpads__';
 // Configuration constants
 export const CONFIG_AUTO_FORMAT = 'autoFormat';
 export const CONFIG_AUTO_PASTE = 'autoPaste';
+export const CONFIG_ALLOWED_FILETYPES = 'allowedFiletypes';
 export const CONFIG_DEFAULT_FILETYPE = 'defaultFiletype';
 export const CONFIG_FILE_PREFIX = 'filePrefix';
 export const CONFIG_PROMPT_FOR_FILENAME = 'promptForFilename';

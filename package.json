@@ -69,6 +69,14 @@
           "default": "",
           "description": "The default file extension to use with 'New scratchpad (default)' command (e.g., 'js', 'ts', 'py')"
         },
+        "scratchpads.allowedFiletypes": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "default": [],
+          "description": "Restrict the filetype picker to only these extensions (e.g., ['txt', 'rb', 'md']). When empty, all filetypes are shown."
+        },
         "scratchpads.showInExplorer": {
           "type": "boolean",
           "default": false,
