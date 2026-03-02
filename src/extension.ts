@@ -1,5 +1,6 @@
 import * as vscode from 'vscode';
 import { Config } from './config';
+import { CONFIG_REMOVE_EMPTY_ON_CLOSE } from './consts';
 import { FiletypesManager } from './filetypes.manager';
 import { ScratchpadTreeProvider } from './scratchpad-tree-provider';
 import { ScratchpadsManager } from './scratchpads.manager';
@@ -101,6 +102,32 @@ export async function activate(context: vscode.ExtensionContext) {
     Config.recalculatePaths();
     treeViewProvider.refreshOnConfigChange();
   });
+
+  context.subscriptions.push(
+    vscode.window.tabGroups.onDidChangeTabs((event) => {
+      if (!Config.getExtensionConfiguration(CONFIG_REMOVE_EMPTY_ON_CLOSE)) {
+        return;
+      }
+
+      for (const tab of event.closed) {
+        if (!(tab.input instanceof vscode.TabInputText)) {
+          continue;
+        }
+
+        const filePath = tab.input.uri.fsPath;
+
+        if (!Utils.isScratchpadFile(filePath)) {
+          continue;
+        }
+
+        try {
+          Utils.deleteFileIfEmpty(filePath);
+        } catch (error) {
+          console.error('[Scratchpads] removeEmptyOnClose error:', error);
+        }
+      }
+    }),
+  );
 }
 
 /**

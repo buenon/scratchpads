@@ -39,6 +39,11 @@
           "default": true,
           "description": "Prompt the user when removing all scratchpads"
         },
+        "scratchpads.removeEmptyOnClose": {
+          "type": "boolean",
+          "default": false,
+          "description": "Automatically remove a scratchpad file when it is closed empty"
+        },
         "scratchpads.promptForFilename": {
           "type": "boolean",
           "default": false,

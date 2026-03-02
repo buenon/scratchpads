@@ -310,12 +310,7 @@ export class ScratchpadsManager {
    * @param {TextEditor} editor The tab to inspect
    */
   private isScratchpadEditor(editor?: vscode.TextEditor) {
-    if (editor) {
-      const editorPath = path.dirname(editor.document.fileName);
-      return editorPath === Config.projectScratchpadsPath;
-    }
-
-    return false;
+    return editor !== undefined && Utils.isScratchpadFile(editor.document.fileName);
   }
 
   /**
