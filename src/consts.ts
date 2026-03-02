@@ -12,6 +12,7 @@ export const CONFIG_DEFAULT_FILETYPE = 'defaultFiletype';
 export const CONFIG_FILE_PREFIX = 'filePrefix';
 export const CONFIG_PROMPT_FOR_FILENAME = 'promptForFilename';
 export const CONFIG_PROMPT_FOR_REMOVAL = 'promptForRemoval';
+export const CONFIG_REMOVE_EMPTY_ON_CLOSE = 'removeEmptyOnClose';
 export const CONFIG_RENAME_WITH_EXTENSION = 'renameWithExtension';
 export const CONFIG_SCRATCHPADS_FOLDER = 'scratchpadsFolder';
 export const CONFIG_SHOW_IN_EXPLORER = 'showInExplorer';

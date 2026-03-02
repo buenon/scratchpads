@@ -204,6 +204,24 @@ export default class Utils {
   }
 
   /**
+   * Check if the given file path belongs to the scratchpads folder
+   * @param filePath Full path to the file
+   */
+  public static isScratchpadFile(filePath: string): boolean {
+    return path.dirname(filePath) === Config.projectScratchpadsPath;
+  }
+
+  /**
+   * Delete a file if its content is empty or whitespace-only
+   * @param filePath Full path to the file
+   */
+  public static deleteFileIfEmpty(filePath: string): void {
+    if (fs.existsSync(filePath) && fs.readFileSync(filePath, 'utf8').trim() === '') {
+      fs.unlinkSync(filePath);
+    }
+  }
+
+  /**
    * Check if file exists and prompt for overwrite if needed
    * @param filePath Path to check
    * @param fileName Display name for the dialog
